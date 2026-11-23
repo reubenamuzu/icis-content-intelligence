@@ -1,4 +1,5 @@
 import { NormalizedPost } from '../ingestion/types';
+import { InstagramPost } from '../schemas/content.schema';
 
 export interface EngagementCalculationResult {
   postId: string;
@@ -18,7 +19,7 @@ export interface EngagementCalculationResult {
  * - If both are <= 0, denominator = 1 to prevent division by zero.
  */
 export function calculateWeightedEngagementRate(
-  post: NormalizedPost,
+  post: NormalizedPost | InstagramPost,
   followerBaseline: number
 ): EngagementCalculationResult {
   const commentWeight = 3;
@@ -42,8 +43,10 @@ export function calculateWeightedEngagementRate(
   // Round to 4 decimal places for clean numerical representation
   const weightedEngagementRate = Math.round(rate * 10000) / 10000;
 
+  const resolvedId = 'postId' in post ? post.postId : (post as NormalizedPost).id;
+
   return {
-    postId: post.id,
+    postId: resolvedId,
     weightedEngagementRate,
     effectiveDenominator,
     denominatorType,

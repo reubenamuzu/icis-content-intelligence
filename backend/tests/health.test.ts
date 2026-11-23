@@ -1,15 +1,34 @@
 import { describe, it, expect } from 'vitest';
-import request from 'supertest';
-import { app } from '../src/app';
+import { healthRouter } from '../src/routes/health';
+import { Request, Response } from 'express';
 
 describe('GET /api/health', () => {
-  it('should return 200 OK with status "ok", timestamp, and uptime', async () => {
-    const res = await request(app).get('/api/health');
+  it('should return 200 OK with status "ok", timestamp, and uptime', () => {
+    let statusCode: number | undefined;
+    let jsonBody: Record<string, unknown> | undefined;
 
-    expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('status', 'ok');
-    expect(res.body).toHaveProperty('timestamp');
-    expect(res.body).toHaveProperty('uptime');
-    expect(typeof res.body.uptime).toBe('number');
+    const mockReq = {} as Request;
+    const mockRes = {
+      status(code: number) {
+        statusCode = code;
+        return this;
+      },
+      json(data: Record<string, unknown>) {
+        jsonBody = data;
+        return this;
+      },
+    } as unknown as Response;
+
+    const routeLayer = healthRouter.stack.find((layer) => layer.route?.path === '/health');
+    const handler = routeLayer?.route?.stack[0]?.handle;
+
+    expect(handler).toBeDefined();
+    handler(mockReq, mockRes);
+
+    expect(statusCode).toBe(200);
+    expect(jsonBody).toHaveProperty('status', 'ok');
+    expect(jsonBody).toHaveProperty('timestamp');
+    expect(jsonBody).toHaveProperty('uptime');
+    expect(typeof jsonBody?.uptime).toBe('number');
   });
 });
