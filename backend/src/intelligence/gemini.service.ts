@@ -120,7 +120,11 @@ export class GeminiService {
     } else {
       this.isCustomClient = false;
       const apiKey = env.GEMINI_API_KEY;
-      this.client = new GoogleGenAI({ apiKey: apiKey || '' });
+      this.client = new GoogleGenAI({
+        apiKey: apiKey || '',
+        apiVersion: env.GOOGLE_GENAI_API_VERSION,
+      });
+      
     }
   }
 

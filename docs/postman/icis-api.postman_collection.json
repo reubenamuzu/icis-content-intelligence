@@ -1,0 +1,231 @@
+{
+  "info": {
+    "name": "ICIS — Instagram Content Intelligence System API",
+    "description": "Ready-made API test collection for ICIS endpoints: Health, Ingested Posts, Deterministic Analytics, and Gemini Content Recommendations.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4000/api",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Health Check",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
+        },
+        "description": "Verifies that the Express server is running and responsive."
+      },
+      "response": []
+    },
+    {
+      "name": "2. Get All Ingested Posts",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Returns normalized posts array', function () {",
+              "    const jsonData = pm.response.json();",
+              "    const posts = Array.isArray(jsonData) ? jsonData : jsonData.posts || jsonData.data;",
+              "    pm.expect(posts).to.be.an('array').that.is.not.empty;",
+              "    pm.expect(posts[0]).to.have.property('postId');",
+              "    pm.expect(posts[0]).to.have.property('reach');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/posts",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "posts"
+          ]
+        },
+        "description": "Fetches all 60 normalized Instagram posts from SimulatedInstagramProvider."
+      },
+      "response": []
+    },
+    {
+      "name": "3. Get Filtered Posts (Type & Topic)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('All returned posts match REEL filter', function () {",
+              "    const jsonData = pm.response.json();",
+              "    const posts = Array.isArray(jsonData) ? jsonData : jsonData.posts || jsonData.data;",
+              "    posts.forEach(post => {",
+              "        pm.expect(post.postType).to.eql('REEL');",
+              "    });",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/posts?postType=REEL",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "posts"
+          ],
+          "query": [
+            {
+              "key": "postType",
+              "value": "REEL",
+              "description": "Filter by REEL, CAROUSEL, or IMAGE"
+            },
+            {
+              "key": "topic",
+              "value": "Tutorial",
+              "description": "Enable to filter by content topic (e.g., Tutorial, Case Study)",
+              "disabled": true
+            }
+          ]
+        },
+        "description": "Tests query parameter filtering on /api/posts. Toggle the disabled 'topic' param in Postman to test combined filtering."
+      },
+      "response": []
+    },
+    {
+      "name": "4. Get Performance Analytics Report",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Contains required deterministic analytics sections', function () {",
+              "    const data = pm.response.json();",
+              "    pm.expect(data).to.have.property('overview');",
+              "    pm.expect(data).to.have.property('topPosts');",
+              "    pm.expect(data).to.have.property('worstPosts');",
+              "    pm.expect(data).to.have.property('formatBreakdown');",
+              "    pm.expect(data).to.have.property('topicBreakdown');",
+              "    pm.expect(data).to.have.property('temporalTrends');",
+              "    pm.expect(data).to.have.property('captionPatterns');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/analytics",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "analytics"
+          ]
+        },
+        "description": "Runs the deterministic AnalyticsService and returns reach-normalized engagement rates, top/worst posts, format lift, topic breakdown, and temporal trends."
+      },
+      "response": []
+    },
+    {
+      "name": "5. Generate AI Content Strategy (Live Gemini)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200 OK', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Gemini returned structured, post-cited recommendations', function () {",
+              "    const data = pm.response.json();",
+              "    pm.expect(data).to.have.property('executiveSummary');",
+              "    pm.expect(data).to.have.property('keyPatterns').that.is.an('array');",
+              "    pm.expect(data).to.have.property('recommendations').that.is.an('array').that.is.not.empty;",
+              "",
+              "    const firstRec = data.recommendations[0];",
+              "    pm.expect(firstRec).to.have.property('supportingPostIds').that.is.an('array').that.is.not.empty;",
+              "    pm.expect(firstRec).to.have.property('dataEvidence').that.is.a('string').that.is.not.empty;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/recommendations",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "recommendations"
+          ]
+        },
+        "description": "Triggers AnalyticsService + GeminiService (gemini-2.5-flash) using your GEMINI_API_KEY in backend/.env and returns Zod-validated, data-grounded content recommendations."
+      },
+      "response": []
+    }
+  ]
+}

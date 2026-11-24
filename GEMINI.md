@@ -11,6 +11,7 @@ Every backend component must strictly adhere to the separation of concerns acros
 
 ### AI / LLM Integration Rules
 - Use only the official `@google/genai` SDK with `gemini-2.5-flash`.
+- Configure `apiVersion: "v1beta"` on the `GoogleGenAI` client; this is required in `@google/genai` v3+ when using `systemInstruction` and structured JSON `responseSchema` (the default `v1` rejects developer instruction with HTTP 400).
 - Always configure structured output with `responseMimeType: "application/json"` and a concrete `responseSchema`.
 - **NEVER** use the deprecated `@google/generative-ai` package.
 - Ground all prompts with deterministic metric summaries from `backend/src/analytics/` to eliminate hallucinations.
