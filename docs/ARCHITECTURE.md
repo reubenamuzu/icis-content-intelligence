@@ -85,25 +85,28 @@
 
 ### 3. Mathematical Specification: Weighted Engagement Rate
 
-#### 3.1 Mathematical Formula
-For any given post $p$:
+#### 3.1 Primary Cross-Format Metric: Weighted Engagement Rate by Reach
+For any given post $p \in \{\text{REEL}, \text{CAROUSEL}, \text{IMAGE}\}$:
 
-$$\text{WER}(p) = \left( \frac{\text{likes}_p + 3 \times \text{comments}_p}{\text{denom}(p)} \right) \times 100$$
+$$\text{WER}(p) = \left( \frac{\text{likes}_p + 3 \times \text{comments}_p}{\text{reach}_p} \right) \times 100$$
 
-Where the denominator $\text{denom}(p)$ is determined by:
+#### 3.2 Uniform Scale Rationale & Metric Decoupling
+1. **Apples-to-Apples Cross-Format Comparability**:
+   - In earlier iterations, conditional denominators (using `views` for Reels and an account follower baseline for static Images) created severe metric scale distortion. A Reel evaluated against 50,000 views and a static post evaluated against 10,000 baseline followers yielded non-comparable percentage figures.
+   - `reach` measures unique accounts exposed to the post and is universally reported across Reels, Carousels, and Static Images. Using `reach` provides a single, uniform denominator across all formats on the exact same scale.
 
-$$\text{denom}(p) = \begin{cases} \text{views}_p & \text{if } \text{views}_p \in \mathbb{N} \land \text{views}_p > 0 \\ \text{ACCOUNT\_FOLLOWER\_BASELINE} & \text{if } \text{views}_p \text{ is } \text{null, undefined, or } \le 0 \end{cases}$$
+2. **Decoupling Video Metrics (`views` and `replayRatio`)**:
+   - `views` represents total video impressions/plays. It is populated for `REEL` posts and `null` for static `IMAGE` and non-video `CAROUSEL` posts.
+   - Rather than polluting the cross-format engagement denominator, `views` is isolated as a video-specific metric.
+   - For `REEL` posts, ICIS computes:
+     $$\text{replayRatio}(p) = \frac{\text{views}_p}{\text{reach}_p}$$
+     A high `replayRatio` ($> 1.0$) demonstrates high retention and audience re-watching behavior.
 
-If both $\text{views}_p$ and $\text{ACCOUNT\_FOLLOWER\_BASELINE}$ are $\le 0$, $\text{denom}(p) = 1$ to prevent division by zero.
-
-#### 3.2 Metric Design Rationale
-1. **Comment Multiplier ($3\times$)**:
-   - Comments require significantly higher cognitive overhead and active platform commitment than a double-tap like.
-   - Algorithms prioritizing conversational threads reward comments with amplified distribution across discovery feeds.
-   - Empirical studies on Instagram engagement indicate comments represent $3\times$ to $5\times$ higher retention and brand recall value than passive likes.
-2. **Adaptive Denominator Handling (`views` vs `ACCOUNT_FOLLOWER_BASELINE`)**:
-   - Video formats (`VIDEO`, `REEL`) record explicit view/play counts, representing actual impressions. Measuring engagement relative to views reflects true conversion efficiency per impression.
-   - Static images (`IMAGE`) lack impression data in organic API endpoints, returning `views: null`. Falling back to `ACCOUNT_FOLLOWER_BASELINE` anchors the post to total audience reach, preventing false infinity or skewed $0\%$ outputs while ensuring equitable comparison across formats.
+3. **Universal Fallback Handling (`ACCOUNT_FOLLOWER_COUNT`)**:
+   - In scenarios where an external provider does not supply `reach` (e.g., basic permission tiers), ICIS uses `followerCount` (via `ACCOUNT_FOLLOWER_COUNT`) applied **uniformly to ALL posts** in the dataset:
+     $$\text{WER}_{\text{fallback}}(p) = \left( \frac{\text{likes}_p + 3 \times \text{comments}_p}{\text{ACCOUNT\_FOLLOWER\_COUNT}} \right) \times 100$$
+   - The system never mixes `views` and `followerCount` in the same analytical comparison.
+   - Division-by-zero protection: If the effective denominator is $\le 0$, it safely defaults to $1$.
 
 ---
 
@@ -119,15 +122,17 @@ export interface NormalizedPost {
   timestamp: string; // ISO 8601
   likes: number;
   comments: number;
-  views: number | null; // Nullable for IMAGE posts
+  reach: number; // Unique accounts reached across all formats
+  views: number | null; // Nullable for IMAGE & CAROUSEL; populated for REEL
   permalink: string;
 }
 
 export interface PostAnalyticsResult {
   post: NormalizedPost;
-  weightedEngagementRate: number;
+  weightedEngagementRate: number; // ((likes + 3 * comments) / reach) * 100
+  replayRatio?: number | null; // views / reach (for REEL)
   effectiveDenominator: number;
-  denominatorType: 'VIEWS' | 'FOLLOWER_BASELINE' | 'FALLBACK';
+  denominatorType: 'REACH' | 'FOLLOWER_COUNT' | 'FALLBACK';
 }
 
 export interface AggregateAnalytics {

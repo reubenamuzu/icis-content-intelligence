@@ -5,7 +5,7 @@
 ### Layered Backend Architecture (`backend/src/`)
 Every backend component must strictly adhere to the separation of concerns across these layers:
 - `backend/src/ingestion/`: Responsible solely for fetching external Instagram/content provider data and normalizing it to internal domain models via `IContentProvider`. No HTTP controllers, business analytics, or LLM logic permitted here.
-- `backend/src/analytics/`: Pure, deterministic math and statistical calculations (e.g., Weighted Engagement Rate, standard deviation, percentile ranking). **Zero Express, HTTP, or LLM imports are allowed in this layer.**
+- `backend/src/analytics/`: Pure, deterministic math and statistical calculations (e.g., Weighted Engagement Rate by Reach, replay ratio, standard deviation, percentile ranking). **Zero Express, HTTP, or LLM imports are allowed in this layer.** Cross-format metrics must use `reach` as the uniform denominator across all formats (`REEL`, `CAROUSEL`, `IMAGE`). `views` is reserved for video-specific metrics (e.g., `replayRatio = views / reach`) and must never be mixed into the cross-format engagement denominator. If `reach` is absent, fall back to `ACCOUNT_FOLLOWER_COUNT` uniformly across all formats.
 - `backend/src/intelligence/`: High-level AI synthesis powered exclusively by the official `@google/genai` SDK. Consumes normalized data and analytics output to generate grounded recommendations and insights.
 - `backend/src/routes/`: HTTP presentation layer. Handles request routing, input validation (using Zod schemas), and HTTP status code mapping only. Delegates directly to domain services without inline business logic.
 
@@ -18,11 +18,11 @@ Every backend component must strictly adhere to the separation of concerns acros
 ### Validation & Type Safety
 - All external data (API payloads, webhooks, scraped data) and environment variables must be validated using `zod`.
 - Strict TypeScript (`strict: true`) must be maintained across all packages. Avoid `any` and unsafe type assertions.
-- Explicitly account for nullable `views` on Instagram static `IMAGE` posts by falling back to `ACCOUNT_FOLLOWER_BASELINE`.
+- Ensure uniform cross-format metric scaling: calculate Weighted Engagement Rate using `reach` across all formats (`REEL`, `CAROUSEL`, `IMAGE`). Keep `views` (nullable for `IMAGE` and `CAROUSEL`, populated for `REEL`) decoupled for video-specific metrics (`replayRatio = views / reach`). If `reach` is missing from a provider, fall back to `ACCOUNT_FOLLOWER_COUNT` uniformly across all formats.
 
 ### Testing Standards
 - Every service, analytical calculation, and route handler requires automated unit tests in `backend/tests/` using `vitest`.
-- Business analytics functions must maintain 100% unit test coverage for edge cases (zero likes/comments, null views, zero baseline followers).
+- Business analytics functions must maintain 100% unit test coverage for edge cases (zero likes/comments, zero reach, fallback follower count, nullable views).
 
 ---
 

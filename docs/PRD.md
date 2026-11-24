@@ -35,17 +35,26 @@ The **Instagram Content Intelligence System (ICIS)** transforms raw Instagram en
 
 #### FR2: Deterministic Performance Analytics
 - The analytics module must calculate deterministic metrics with zero LLM or framework dependencies.
-- **Weighted Engagement Rate Formula**:
-  $$\text{Engagement Rate (\%)} = \left( \frac{\text{likes} + 3 \times \text{comments}}{\text{denominator}} \right) \times 100$$
+- **Primary Cross-Format Metric: Weighted Engagement Rate by Reach**:
+  $$\text{Weighted Engagement Rate (\%)} = \left( \frac{\text{likes} + 3 \times \text{comments}}{\text{reach}} \right) \times 100$$
   - **Comment Weight Justification (3x)**:
     - **Cognitive Effort**: Liking a post requires a single double-tap or tap (low friction / passive interaction). Writing a comment requires reading, reflection, text entry, and public social commitment.
     - **Algorithmic Signal**: Social platform algorithms (specifically Meta's Graph ranking system) weight conversational feedback, replies, and active discussions significantly higher than passive likes when distributing content across Explore and recommended feeds.
     - **Intentionality**: Comments indicate active community building and intent, which directly correlates with audience retention and conversion.
-  - **Adaptive Denominator Handling (`views` vs `ACCOUNT_FOLLOWER_BASELINE`)**:
-    - For `VIDEO` and `REEL` formats, the Instagram API delivers concrete `views` (or video play counts). When `views` is present and $> 0$, `denominator = views`.
-    - For static `IMAGE` posts, the Instagram Graph API does not provide a view or impression metric for organic media without advanced graph insights permissions. Thus, `views` is `null`.
-    - When `views` is `null`, `undefined`, or $\le 0$, the formula safely falls back to `ACCOUNT_FOLLOWER_BASELINE` (configured via environment variable, e.g., 10,000) as the reach proxy.
-    - Guard against division-by-zero: if both `views` and `ACCOUNT_FOLLOWER_BASELINE` are $\le 0$, the denominator defaults to 1.
+  - **Uniform Scale Across All Formats (`reach`)**:
+    - Unlike video plays/views, `reach` represents unique accounts that saw the post and is universally available across all content formats: `REEL`, `CAROUSEL`, and `IMAGE`.
+    - Using `reach` as the uniform denominator ensures an apples-to-apples comparison across all media types on the exact same scale, eliminating scale distortion.
+  - **Decoupled Video Metrics (`views` & `replayRatio`)**:
+    - `views` (video play count) is nullable for `IMAGE` and `CAROUSEL` and populated for `REEL`.
+    - `views` is strictly decoupled from the cross-format engagement denominator to avoid mixing impressions with reach.
+    - Instead, `views` is tracked as a separate Reel-specific video performance metric alongside `replayRatio`:
+      $$\text{replayRatio} = \frac{\text{views}}{\text{reach}}$$
+      A `replayRatio > 1.0` signifies that viewers are replaying the Reel multiple times (a key signal for viral retention).
+  - **Universal Fallback Denominator (`ACCOUNT_FOLLOWER_COUNT`)**:
+    - If an external ingestion provider or legacy endpoint lacks post-level `reach`, the fallback denominator must be `followerCount` (configured via `ACCOUNT_FOLLOWER_COUNT`), applied **uniformly across ALL formats**:
+      $$\text{Weighted Engagement Rate by Followers (\%)} = \left( \frac{\text{likes} + 3 \times \text{comments}}{\text{ACCOUNT\_FOLLOWER\_COUNT}} \right) \times 100$$
+    - The fallback never selectively applies follower counts to only static images while using views for reels; uniform denominator scaling is maintained across the entire post collection.
+    - Division-by-zero protection: If `reach` (or `ACCOUNT_FOLLOWER_COUNT`) is $\le 0$, the denominator safely defaults to 1.
 - Aggregate metrics generated:
   - Mean Weighted Engagement Rate (overall and per media type)
   - Top 10% high-performing benchmark posts (outliers)

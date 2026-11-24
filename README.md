@@ -29,9 +29,12 @@ flowchart LR
 
 ### Core Engineering Decisions
 1. **Preventing LLM Hallucinations:** LLMs do not compute raw statistics. The deterministic analytics engine aggregates all ratios and rankings first; Gemini only synthesizes strategy from verified metrics and must pass Zod post-validation confirming cited `postId`s exist.
-2. **Weighted Engagement Rate Formula:**
-   $$\text{Weighted Engagement Rate} = \left(\frac{\text{Likes} + (3 \times \text{Comments})}{\text{Views or Account Follower Baseline}}\right) \times 100$$
-   Comments receive a $3\times$ weight because they reflect higher audience intent than passive likes. Static `IMAGE` posts (`views: null`) fall back cleanly to `ACCOUNT_FOLLOWER_BASELINE` to prevent division-by-zero errors and maintain cross-format comparability.
+2. **Weighted Engagement Rate Formula (Uniform Cross-Format Scale):**
+   $$\text{Weighted Engagement Rate} = \left(\frac{\text{Likes} + (3 \times \text{Comments})}{\text{Reach}}\right) \times 100$$
+   - **Uniform Denominator (`reach`):** `reach` (unique accounts reached) is available across all media types (`REEL`, `CAROUSEL`, `IMAGE`), ensuring an apples-to-apples comparison on the exact same scale without metric distortion.
+   - **Comment Weighting ($3\times$):** Comments receive a $3\times$ multiplier reflecting active cognitive investment and algorithmic ranking weight over passive double-taps.
+   - **Decoupled Video Metrics:** `views` is preserved as a video-specific metric for Reels (evaluating $\text{replayRatio} = \text{views} / \text{reach}$) rather than distorting the cross-format engagement denominator.
+   - **Uniform Fallback (`ACCOUNT_FOLLOWER_COUNT`):** If an external provider lacks `reach`, `ACCOUNT_FOLLOWER_COUNT` is applied uniformly to all formats.
 
 ---
 
@@ -92,7 +95,7 @@ Create `backend/.env` using the root `.env.example` template:
 ```env
 PORT=4000
 GEMINI_API_KEY=your_gemini_api_key_here
-ACCOUNT_FOLLOWER_BASELINE=10000
+ACCOUNT_FOLLOWER_COUNT=10000
 ```
 
 Start the Express development server:

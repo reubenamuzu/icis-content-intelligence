@@ -10,18 +10,35 @@ export const InstagramPostSchema = z
     postType: PostTypeEnum,
     topic: z.string().min(1, 'topic must not be empty'),
     publishedAt: z.string().datetime({ message: 'publishedAt must be a valid ISO 8601 datetime string' }),
+    reach: z.number().int().positive('reach must be a positive integer'),
     likes: z.number().int().nonnegative('likes must be a non-negative integer'),
     comments: z.number().int().nonnegative('comments must be a non-negative integer'),
     views: z.number().int().nonnegative('views must be a non-negative integer').nullable(),
     saves: z.number().int().nonnegative('saves must be a non-negative integer').optional(),
   })
   .superRefine((data, ctx) => {
-    if (data.postType === 'IMAGE' && data.views !== null) {
+    if ((data.postType === 'IMAGE' || data.postType === 'CAROUSEL') && data.views !== null) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'views must be null for IMAGE posts',
+        message: 'views must be null for IMAGE and CAROUSEL posts',
         path: ['views'],
       });
+    }
+
+    if (data.postType === 'REEL') {
+      if (data.views === null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'views must be populated for REEL posts',
+          path: ['views'],
+        });
+      } else if (data.views < data.reach) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'views must be greater than or equal to reach for REEL posts',
+          path: ['views'],
+        });
+      }
     }
   });
 

@@ -8,7 +8,8 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(4000),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   GEMINI_API_KEY: z.string().default(process.env.NODE_ENV === 'test' ? 'test-api-key' : ''),
-  ACCOUNT_FOLLOWER_BASELINE: z.coerce.number().positive().default(10000),
+  ACCOUNT_FOLLOWER_COUNT: z.coerce.number().positive().default(10000),
+  ACCOUNT_FOLLOWER_BASELINE: z.coerce.number().positive().optional().default(10000),
 });
 
 export type Env = z.infer<typeof envSchema>;

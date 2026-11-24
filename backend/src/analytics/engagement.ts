@@ -5,7 +5,8 @@ export interface EngagementCalculationResult {
   postId: string;
   weightedEngagementRate: number;
   effectiveDenominator: number;
-  denominatorType: 'VIEWS' | 'FOLLOWER_BASELINE' | 'SAFE_MINIMUM';
+  denominatorType: 'REACH' | 'VIEWS' | 'FOLLOWER_BASELINE' | 'SAFE_MINIMUM';
+  replayRatio?: number | null;
 }
 
 /**
@@ -13,22 +14,26 @@ export interface EngagementCalculationResult {
  *
  * Formula: ((likes + 3 * comments) / denominator) * 100
  *
- * Denominator resolution:
- * - If views is non-null and > 0, denominator = views (typical for VIDEO/REEL).
- * - For static IMAGE posts where views is null/undefined, denominator = followerBaseline.
- * - If both are <= 0, denominator = 1 to prevent division by zero.
+ * Denominator resolution (Cross-Format Uniform Scale):
+ * - If post.reach is present and > 0, denominator = post.reach (uniform across REEL, CAROUSEL, IMAGE).
+ * - For legacy posts without reach where views is > 0, denominator = views.
+ * - If reach and views are absent/null, falls back to followerBaseline.
+ * - If all are <= 0, denominator = 1 to prevent division by zero.
  */
 export function calculateWeightedEngagementRate(
-  post: NormalizedPost | InstagramPost,
+  post: NormalizedPost | InstagramPost | (NormalizedPost & { reach?: number }),
   followerBaseline: number
 ): EngagementCalculationResult {
   const commentWeight = 3;
   const weightedEngagements = post.likes + commentWeight * post.comments;
 
   let effectiveDenominator: number;
-  let denominatorType: 'VIEWS' | 'FOLLOWER_BASELINE' | 'SAFE_MINIMUM';
+  let denominatorType: 'REACH' | 'VIEWS' | 'FOLLOWER_BASELINE' | 'SAFE_MINIMUM';
 
-  if (typeof post.views === 'number' && post.views > 0) {
+  if ('reach' in post && typeof post.reach === 'number' && post.reach > 0) {
+    effectiveDenominator = post.reach;
+    denominatorType = 'REACH';
+  } else if (typeof post.views === 'number' && post.views > 0) {
     effectiveDenominator = post.views;
     denominatorType = 'VIEWS';
   } else if (followerBaseline > 0) {
@@ -45,10 +50,22 @@ export function calculateWeightedEngagementRate(
 
   const resolvedId = 'postId' in post ? post.postId : (post as NormalizedPost).id;
 
+  let replayRatio: number | null = null;
+  if (
+    'reach' in post &&
+    typeof post.reach === 'number' &&
+    post.reach > 0 &&
+    typeof post.views === 'number' &&
+    post.views > 0
+  ) {
+    replayRatio = Math.round((post.views / post.reach) * 100) / 100;
+  }
+
   return {
     postId: resolvedId,
     weightedEngagementRate,
     effectiveDenominator,
     denominatorType,
+    replayRatio,
   };
 }

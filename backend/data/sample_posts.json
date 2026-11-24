@@ -5,32 +5,35 @@
     "postType": "REEL",
     "topic": "Tutorial",
     "publishedAt": "2026-09-01T18:15:00.000Z",
-    "likes": 3393,
-    "comments": 407,
-    "views": 41470,
-    "saves": 1188
+    "reach": 13730,
+    "likes": 1681,
+    "comments": 303,
+    "views": 15789,
+    "saves": 588
   },
   {
     "postId": "post_002",
     "caption": "What actually happens when your vector database hits 10 million embeddings? Here is how we scaled Qdrant without latency spikes.",
     "postType": "REEL",
     "topic": "Case Study",
-    "publishedAt": "2026-08-27T07:30:00.000Z",
-    "likes": 2552,
-    "comments": 383,
-    "views": 31320,
-    "saves": 128
+    "publishedAt": "2026-08-28T07:30:00.000Z",
+    "reach": 12142,
+    "likes": 1006,
+    "comments": 211,
+    "views": 14570,
+    "saves": 50
   },
   {
     "postId": "post_003",
     "caption": "Ever wonder why some AI agents get stuck in infinite reasoning loops? Here is the exact architecture fix we implemented.",
     "postType": "REEL",
     "topic": "Product Launch",
-    "publishedAt": "2026-08-28T14:30:00.000Z",
-    "likes": 2673,
-    "comments": 80,
-    "views": 32940,
-    "saves": 134
+    "publishedAt": "2026-08-29T14:30:00.000Z",
+    "reach": 12665,
+    "likes": 1527,
+    "comments": 61,
+    "views": 15831,
+    "saves": 76
   },
   {
     "postId": "post_004",
@@ -38,32 +41,35 @@
     "postType": "REEL",
     "topic": "Behind the Scenes",
     "publishedAt": "2026-09-03T21:15:00.000Z",
-    "likes": 3902,
-    "comments": 78,
-    "views": 48256,
-    "saves": 1171
+    "reach": 15583,
+    "likes": 2695,
+    "comments": 81,
+    "views": 20258,
+    "saves": 809
   },
   {
     "postId": "post_005",
     "caption": "What actually happens when your vector database hits 10 million embeddings? Here is how we scaled Qdrant without latency spikes.",
     "postType": "REEL",
     "topic": "Industry Myth",
-    "publishedAt": "2026-08-31T11:30:00.000Z",
-    "likes": 2916,
-    "comments": 117,
-    "views": 36180,
-    "saves": 146
+    "publishedAt": "2026-09-01T11:30:00.000Z",
+    "reach": 13710,
+    "likes": 1609,
+    "comments": 80,
+    "views": 18508,
+    "saves": 80
   },
   {
     "postId": "post_006",
     "caption": "Are you still prompting your LLMs with free-form text instead of strict JSON schemas? Here is why that is costing you money.",
     "postType": "REEL",
     "topic": "Tutorial",
-    "publishedAt": "2026-09-02T01:30:00.000Z",
-    "likes": 3038,
-    "comments": 577,
-    "views": 37800,
-    "saves": 1063
+    "publishedAt": "2026-09-03T01:30:00.000Z",
+    "reach": 14233,
+    "likes": 1224,
+    "comments": 233,
+    "views": 19926,
+    "saves": 428
   },
   {
     "postId": "post_007",
@@ -71,32 +77,35 @@
     "postType": "REEL",
     "topic": "Case Study",
     "publishedAt": "2026-09-08T20:15:00.000Z",
-    "likes": 4581,
-    "comments": 641,
-    "views": 57159,
-    "saves": 229
+    "reach": 17769,
+    "likes": 2095,
+    "comments": 461,
+    "views": 25765,
+    "saves": 105
   },
   {
     "postId": "post_008",
     "caption": "3 critical mistakes killing your AI application performance in 2026:\n1. Ignoring context window token limits\n2. Missing fallback providers\n3. Over-complicating agent architectures.",
     "postType": "REEL",
     "topic": "Product Launch",
-    "publishedAt": "2026-09-05T15:30:00.000Z",
-    "likes": 3159,
-    "comments": 126,
-    "views": 39520,
-    "saves": 948
+    "publishedAt": "2026-09-06T15:30:00.000Z",
+    "reach": 14993,
+    "likes": 1695,
+    "comments": 85,
+    "views": 22490,
+    "saves": 509
   },
   {
     "postId": "post_009",
     "caption": "Product roadmap sync with the engineering team.",
     "postType": "REEL",
     "topic": "Behind the Scenes",
-    "publishedAt": "2026-09-06T05:30:00.000Z",
-    "likes": 1386,
-    "comments": 42,
-    "views": 17380,
-    "saves": 69
+    "publishedAt": "2026-09-07T05:30:00.000Z",
+    "reach": 10086,
+    "likes": 495,
+    "comments": 20,
+    "views": 15633,
+    "saves": 25
   },
   {
     "postId": "post_010",
@@ -104,32 +113,35 @@
     "postType": "REEL",
     "topic": "Industry Myth",
     "publishedAt": "2026-09-10T19:15:00.000Z",
-    "likes": 4920,
-    "comments": 98,
-    "views": 61828,
-    "saves": 1476
+    "reach": 19290,
+    "likes": 3336,
+    "comments": 100,
+    "views": 30864,
+    "saves": 1001
   },
   {
     "postId": "post_011",
     "caption": "5 AI tools that will save your engineering team 25+ hours this week:\n1. Ollama for local testing\n2. Qdrant for hybrid vector search\n3. Pydantic/Zod for schema validation\n4. Langfuse for tracing\n5. ICIS for content analytics.",
     "postType": "REEL",
     "topic": "Tutorial",
-    "publishedAt": "2026-09-09T02:30:00.000Z",
-    "likes": 3510,
-    "comments": 632,
-    "views": 44200,
-    "saves": 1229
+    "publishedAt": "2026-09-10T02:30:00.000Z",
+    "reach": 16533,
+    "likes": 1343,
+    "comments": 269,
+    "views": 27279,
+    "saves": 470
   },
   {
     "postId": "post_012",
     "caption": "What actually happens when your vector database hits 10 million embeddings? Here is how we scaled Qdrant without latency spikes.",
     "postType": "REEL",
     "topic": "Case Study",
-    "publishedAt": "2026-09-11T09:30:00.000Z",
-    "likes": 3767,
-    "comments": 490,
-    "views": 47520,
-    "saves": 188
+    "publishedAt": "2026-09-12T09:30:00.000Z",
+    "reach": 17370,
+    "likes": 1388,
+    "comments": 319,
+    "views": 19976,
+    "saves": 69
   },
   {
     "postId": "post_013",
@@ -137,65 +149,71 @@
     "postType": "REEL",
     "topic": "Product Launch",
     "publishedAt": "2026-09-15T18:15:00.000Z",
-    "likes": 2297,
-    "comments": 46,
-    "views": 29029,
-    "saves": 115
+    "reach": 13753,
+    "likes": 1006,
+    "comments": 30,
+    "views": 16504,
+    "saves": 50
   },
   {
     "postId": "post_014",
     "caption": "5 architectural patterns every AI engineer must know:\n1. Router pattern\n2. Parallel tool fan-out\n3. Reflection & critique loops\n4. RAG with semantic reranking\n5. Deterministic fallback states.",
     "postType": "REEL",
     "topic": "Behind the Scenes",
-    "publishedAt": "2026-09-14T06:30:00.000Z",
-    "likes": 3861,
-    "comments": 154,
-    "views": 48880,
-    "saves": 1158
+    "publishedAt": "2026-09-15T06:30:00.000Z",
+    "reach": 18072,
+    "likes": 2043,
+    "comments": 102,
+    "views": 22590,
+    "saves": 613
   },
   {
     "postId": "post_015",
     "caption": "What actually happens when your vector database hits 10 million embeddings? Here is how we scaled Qdrant without latency spikes.",
     "postType": "REEL",
     "topic": "Industry Myth",
-    "publishedAt": "2026-09-15T13:30:00.000Z",
-    "likes": 4131,
-    "comments": 124,
-    "views": 52380,
-    "saves": 207
+    "publishedAt": "2026-09-16T13:30:00.000Z",
+    "reach": 18939,
+    "likes": 2283,
+    "comments": 91,
+    "views": 24621,
+    "saves": 114
   },
   {
     "postId": "post_016",
     "caption": "Are you still prompting your LLMs with free-form text instead of strict JSON schemas? Here is why that is costing you money.",
     "postType": "REEL",
     "topic": "Tutorial",
-    "publishedAt": "2026-09-17T21:15:00.000Z",
-    "likes": 6166,
-    "comments": 1048,
-    "views": 78300,
-    "saves": 2158
+    "publishedAt": "2026-09-24T21:15:00.000Z",
+    "reach": 23435,
+    "likes": 2814,
+    "comments": 591,
+    "views": 31637,
+    "saves": 985
   },
   {
     "postId": "post_017",
     "caption": "Want to know how we reduced our Gemini API latency by 68% with deterministic caching? Dive into the details below.",
     "postType": "REEL",
     "topic": "Case Study",
-    "publishedAt": "2026-09-18T10:30:00.000Z",
-    "likes": 4374,
-    "comments": 525,
-    "views": 55620,
-    "saves": 219
+    "publishedAt": "2026-09-19T10:30:00.000Z",
+    "reach": 19985,
+    "likes": 1569,
+    "comments": 377,
+    "views": 27979,
+    "saves": 78
   },
   {
     "postId": "post_018",
     "caption": "3 critical mistakes killing your AI application performance in 2026:\n1. Ignoring context window token limits\n2. Missing fallback providers\n3. Over-complicating agent architectures.",
     "postType": "REEL",
     "topic": "Product Launch",
-    "publishedAt": "2026-09-20T00:30:00.000Z",
-    "likes": 4329,
-    "comments": 130,
-    "views": 55120,
-    "saves": 1299
+    "publishedAt": "2026-09-21T00:30:00.000Z",
+    "reach": 20124,
+    "likes": 2336,
+    "comments": 93,
+    "views": 29180,
+    "saves": 701
   },
   {
     "postId": "post_019",
@@ -203,32 +221,35 @@
     "postType": "REEL",
     "topic": "Behind the Scenes",
     "publishedAt": "2026-09-22T20:15:00.000Z",
-    "likes": 2727,
-    "comments": 55,
-    "views": 34771,
-    "saves": 136
+    "reach": 16164,
+    "likes": 1183,
+    "comments": 35,
+    "views": 24246,
+    "saves": 59
   },
   {
     "postId": "post_020",
     "caption": "3 essential strategies to cut your enterprise LLM API bill by 60%:\n1. Semantic prompt caching\n2. Model tiering (Flash vs Pro)\n3. Strict token pruning on history.",
     "postType": "REEL",
     "topic": "Industry Myth",
-    "publishedAt": "2026-09-23T14:30:00.000Z",
-    "likes": 4563,
-    "comments": 183,
-    "views": 58240,
-    "saves": 1369
+    "publishedAt": "2026-09-24T14:30:00.000Z",
+    "reach": 21150,
+    "likes": 2391,
+    "comments": 120,
+    "views": 32782,
+    "saves": 717
   },
   {
     "postId": "post_021",
     "caption": "5 AI tools that will save your engineering team 25+ hours this week:\n1. Ollama for local testing\n2. Qdrant for hybrid vector search\n3. Pydantic/Zod for schema validation\n4. Langfuse for tracing\n5. ICIS for content analytics.",
     "postType": "REEL",
     "topic": "Tutorial",
-    "publishedAt": "2026-09-24T04:30:00.000Z",
-    "likes": 4680,
-    "comments": 749,
-    "views": 59800,
-    "saves": 1638
+    "publishedAt": "2026-09-25T04:30:00.000Z",
+    "reach": 21663,
+    "likes": 1697,
+    "comments": 373,
+    "views": 34661,
+    "saves": 594
   },
   {
     "postId": "post_022",
@@ -236,32 +257,35 @@
     "postType": "REEL",
     "topic": "Case Study",
     "publishedAt": "2026-10-01T19:15:00.000Z",
-    "likes": 7223,
-    "comments": 1372,
-    "views": 92394,
-    "saves": 361
+    "reach": 25000,
+    "likes": 3178,
+    "comments": 572,
+    "views": 41250,
+    "saves": 159
   },
   {
     "postId": "post_023",
     "caption": "Ever wonder why some AI agents get stuck in infinite reasoning loops? Here is the exact architecture fix we implemented.",
     "postType": "REEL",
     "topic": "Product Launch",
-    "publishedAt": "2026-09-27T01:30:00.000Z",
-    "likes": 5103,
-    "comments": 204,
-    "views": 65340,
-    "saves": 255
+    "publishedAt": "2026-09-28T01:30:00.000Z",
+    "reach": 23122,
+    "likes": 2714,
+    "comments": 136,
+    "views": 26590,
+    "saves": 136
   },
   {
     "postId": "post_024",
     "caption": "5 architectural patterns every AI engineer must know:\n1. Router pattern\n2. Parallel tool fan-out\n3. Reflection & critique loops\n4. RAG with semantic reranking\n5. Deterministic fallback states.",
     "postType": "REEL",
     "topic": "Behind the Scenes",
-    "publishedAt": "2026-09-29T08:30:00.000Z",
-    "likes": 2431,
-    "comments": 73,
-    "views": 64480,
-    "saves": 729
+    "publishedAt": "2026-09-30T08:30:00.000Z",
+    "reach": 23203,
+    "likes": 2693,
+    "comments": 108,
+    "views": 27844,
+    "saves": 808
   },
   {
     "postId": "post_025",
@@ -269,32 +293,35 @@
     "postType": "REEL",
     "topic": "Industry Myth",
     "publishedAt": "2026-10-06T18:15:00.000Z",
-    "likes": 3837,
-    "comments": 77,
-    "views": 99441,
-    "saves": 192
+    "reach": 25000,
+    "likes": 4490,
+    "comments": 135,
+    "views": 31250,
+    "saves": 225
   },
   {
     "postId": "post_026",
     "caption": "Are you still prompting your LLMs with free-form text instead of strict JSON schemas? Here is why that is costing you money.",
     "postType": "CAROUSEL",
     "topic": "Tutorial",
-    "publishedAt": "2026-10-02T05:30:00.000Z",
-    "likes": 1958,
-    "comments": 294,
-    "views": 45900,
-    "saves": 685
+    "publishedAt": "2026-10-03T05:30:00.000Z",
+    "reach": 15105,
+    "likes": 1026,
+    "comments": 236,
+    "views": null,
+    "saves": 359
   },
   {
     "postId": "post_027",
     "caption": "Want to know how we reduced our Gemini API latency by 68% with deterministic caching? Dive into the details below.",
     "postType": "CAROUSEL",
     "topic": "Case Study",
-    "publishedAt": "2026-10-03T12:30:00.000Z",
-    "likes": 2052,
-    "comments": 369,
-    "views": 46980,
-    "saves": 513
+    "publishedAt": "2026-10-04T12:30:00.000Z",
+    "reach": 15453,
+    "likes": 1129,
+    "comments": 215,
+    "views": null,
+    "saves": 316
   },
   {
     "postId": "post_028",
@@ -302,32 +329,35 @@
     "postType": "CAROUSEL",
     "topic": "Product Launch",
     "publishedAt": "2026-10-08T21:15:00.000Z",
-    "likes": 1268,
-    "comments": 25,
-    "views": 28391,
-    "saves": 317
+    "reach": 5001,
+    "likes": 311,
+    "comments": 9,
+    "views": null,
+    "saves": 87
   },
   {
     "postId": "post_029",
     "caption": "Building the future of content intelligence.",
     "postType": "CAROUSEL",
     "topic": "Behind the Scenes",
-    "publishedAt": "2026-10-06T09:30:00.000Z",
-    "likes": 913,
-    "comments": 37,
-    "views": 20020,
-    "saves": 228
+    "publishedAt": "2026-10-07T09:30:00.000Z",
+    "reach": 4376,
+    "likes": 178,
+    "comments": 9,
+    "views": null,
+    "saves": 50
   },
   {
     "postId": "post_030",
     "caption": "3 essential strategies to cut your enterprise LLM API bill by 60%:\n1. Semantic prompt caching\n2. Model tiering (Flash vs Pro)\n3. Strict token pruning on history.",
     "postType": "CAROUSEL",
     "topic": "Industry Myth",
-    "publishedAt": "2026-10-08T16:30:00.000Z",
-    "likes": 2249,
-    "comments": 67,
-    "views": 48360,
-    "saves": 562
+    "publishedAt": "2026-10-09T16:30:00.000Z",
+    "reach": 7069,
+    "likes": 697,
+    "comments": 28,
+    "views": null,
+    "saves": 195
   },
   {
     "postId": "post_031",
@@ -335,32 +365,35 @@
     "postType": "CAROUSEL",
     "topic": "Tutorial",
     "publishedAt": "2026-10-13T20:15:00.000Z",
-    "likes": 3393,
-    "comments": 475,
-    "views": 71630,
-    "saves": 1188
+    "reach": 8924,
+    "likes": 831,
+    "comments": 199,
+    "views": null,
+    "saves": 291
   },
   {
     "postId": "post_032",
     "caption": "What actually happens when your vector database hits 10 million embeddings? Here is how we scaled Qdrant without latency spikes.",
     "postType": "CAROUSEL",
     "topic": "Case Study",
-    "publishedAt": "2026-10-11T13:30:00.000Z",
-    "likes": 2525,
-    "comments": 429,
-    "views": 52380,
-    "saves": 631
+    "publishedAt": "2026-10-12T13:30:00.000Z",
+    "reach": 7901,
+    "likes": 567,
+    "comments": 113,
+    "views": null,
+    "saves": 159
   },
   {
     "postId": "post_033",
     "caption": "Ever wonder why some AI agents get stuck in infinite reasoning loops? Here is the exact architecture fix we implemented.",
     "postType": "CAROUSEL",
     "topic": "Product Launch",
-    "publishedAt": "2026-10-12T03:30:00.000Z",
-    "likes": 2619,
-    "comments": 79,
-    "views": 19710,
-    "saves": 655
+    "publishedAt": "2026-10-13T03:30:00.000Z",
+    "reach": 8249,
+    "likes": 845,
+    "comments": 34,
+    "views": null,
+    "saves": 237
   },
   {
     "postId": "post_034",
@@ -368,32 +401,35 @@
     "postType": "CAROUSEL",
     "topic": "Behind the Scenes",
     "publishedAt": "2026-10-15T19:15:00.000Z",
-    "likes": 3789,
-    "comments": 76,
-    "views": 29029,
-    "saves": 947
+    "reach": 10160,
+    "likes": 1493,
+    "comments": 45,
+    "views": null,
+    "saves": 418
   },
   {
     "postId": "post_035",
     "caption": "What actually happens when your vector database hits 10 million embeddings? Here is how we scaled Qdrant without latency spikes.",
     "postType": "CAROUSEL",
     "topic": "Industry Myth",
-    "publishedAt": "2026-10-15T00:30:00.000Z",
-    "likes": 2808,
-    "comments": 112,
-    "views": 21870,
-    "saves": 702
+    "publishedAt": "2026-10-16T00:30:00.000Z",
+    "reach": 8947,
+    "likes": 893,
+    "comments": 45,
+    "views": null,
+    "saves": 250
   },
   {
     "postId": "post_036",
     "caption": "Are you still prompting your LLMs with free-form text instead of strict JSON schemas? Here is why that is costing you money.",
     "postType": "CAROUSEL",
     "topic": "Tutorial",
-    "publishedAt": "2026-10-17T07:30:00.000Z",
-    "likes": 2903,
-    "comments": 377,
-    "views": 22950,
-    "saves": 1016
+    "publishedAt": "2026-10-18T07:30:00.000Z",
+    "reach": 9295,
+    "likes": 693,
+    "comments": 125,
+    "views": null,
+    "saves": 243
   },
   {
     "postId": "post_037",
@@ -401,32 +437,35 @@
     "postType": "CAROUSEL",
     "topic": "Case Study",
     "publishedAt": "2026-10-20T18:15:00.000Z",
-    "likes": 4346,
-    "comments": 695,
-    "views": 34844,
-    "saves": 1087
+    "reach": 11613,
+    "likes": 1185,
+    "comments": 249,
+    "views": null,
+    "saves": 332
   },
   {
     "postId": "post_038",
     "caption": "3 critical mistakes killing your AI application performance in 2026:\n1. Ignoring context window token limits\n2. Missing fallback providers\n3. Over-complicating agent architectures.",
     "postType": "CAROUSEL",
     "topic": "Product Launch",
-    "publishedAt": "2026-10-20T04:30:00.000Z",
-    "likes": 2977,
-    "comments": 119,
-    "views": 24180,
-    "saves": 744
+    "publishedAt": "2026-10-21T04:30:00.000Z",
+    "reach": 9806,
+    "likes": 942,
+    "comments": 47,
+    "views": null,
+    "saves": 264
   },
   {
     "postId": "post_039",
     "caption": "Product roadmap sync with the engineering team.",
     "postType": "CAROUSEL",
     "topic": "Behind the Scenes",
-    "publishedAt": "2026-10-21T11:30:00.000Z",
-    "likes": 1298,
-    "comments": 39,
-    "views": 10670,
-    "saves": 325
+    "publishedAt": "2026-10-22T11:30:00.000Z",
+    "reach": 6600,
+    "likes": 275,
+    "comments": 11,
+    "views": null,
+    "saves": 77
   },
   {
     "postId": "post_040",
@@ -434,65 +473,71 @@
     "postType": "CAROUSEL",
     "topic": "Industry Myth",
     "publishedAt": "2026-10-29T21:15:00.000Z",
-    "likes": 4581,
-    "comments": 92,
-    "views": 38077,
-    "saves": 1145
+    "reach": 12631,
+    "likes": 1857,
+    "comments": 56,
+    "views": null,
+    "saves": 520
   },
   {
     "postId": "post_041",
     "caption": "5 AI tools that will save your engineering team 25+ hours this week:\n1. Ollama for local testing\n2. Qdrant for hybrid vector search\n3. Pydantic/Zod for schema validation\n4. Langfuse for tracing\n5. ICIS for content analytics.",
     "postType": "CAROUSEL",
     "topic": "Tutorial",
-    "publishedAt": "2026-10-24T08:30:00.000Z",
-    "likes": 3250,
-    "comments": 390,
-    "views": 27300,
-    "saves": 1138
+    "publishedAt": "2026-10-25T08:30:00.000Z",
+    "reach": 10832,
+    "likes": 762,
+    "comments": 145,
+    "views": null,
+    "saves": 267
   },
   {
     "postId": "post_042",
     "caption": "What actually happens when your vector database hits 10 million embeddings? Here is how we scaled Qdrant without latency spikes.",
     "postType": "CAROUSEL",
     "topic": "Case Study",
-    "publishedAt": "2026-10-26T15:30:00.000Z",
-    "likes": 3470,
-    "comments": 521,
-    "views": 29430,
-    "saves": 868
+    "publishedAt": "2026-10-27T15:30:00.000Z",
+    "reach": 11387,
+    "likes": 787,
+    "comments": 173,
+    "views": null,
+    "saves": 220
   },
   {
     "postId": "post_043",
     "caption": "Late night deployment at the AI lab.",
     "postType": "CAROUSEL",
     "topic": "Product Launch",
-    "publishedAt": "2026-10-27T20:15:00.000Z",
-    "likes": 2105,
-    "comments": 42,
-    "views": 18024,
-    "saves": 526
+    "publishedAt": "2026-11-03T20:15:00.000Z",
+    "reach": 9020,
+    "likes": 561,
+    "comments": 17,
+    "views": null,
+    "saves": 157
   },
   {
     "postId": "post_044",
     "caption": "5 architectural patterns every AI engineer must know:\n1. Router pattern\n2. Parallel tool fan-out\n3. Reflection & critique loops\n4. RAG with semantic reranking\n5. Deterministic fallback states.",
     "postType": "CAROUSEL",
     "topic": "Behind the Scenes",
-    "publishedAt": "2026-10-29T12:30:00.000Z",
-    "likes": 1573,
-    "comments": 63,
-    "views": 30420,
-    "saves": 393
+    "publishedAt": "2026-10-30T12:30:00.000Z",
+    "reach": 11858,
+    "likes": 1139,
+    "comments": 57,
+    "views": null,
+    "saves": 319
   },
   {
     "postId": "post_045",
     "caption": "What actually happens when your vector database hits 10 million embeddings? Here is how we scaled Qdrant without latency spikes.",
     "postType": "CAROUSEL",
     "topic": "Industry Myth",
-    "publishedAt": "2026-10-30T02:30:00.000Z",
-    "likes": 1728,
-    "comments": 52,
-    "views": 32670,
-    "saves": 432
+    "publishedAt": "2026-10-31T02:30:00.000Z",
+    "reach": 12432,
+    "likes": 1274,
+    "comments": 51,
+    "views": null,
+    "saves": 357
   },
   {
     "postId": "post_046",
@@ -500,32 +545,35 @@
     "postType": "IMAGE",
     "topic": "Tutorial",
     "publishedAt": "2026-11-05T19:15:00.000Z",
-    "likes": 636,
-    "comments": 121,
+    "reach": 3358,
+    "likes": 123,
+    "comments": 25,
     "views": null,
-    "saves": 223
+    "saves": 43
   },
   {
     "postId": "post_047",
     "caption": "Want to know how we reduced our Gemini API latency by 68% with deterministic caching? Dive into the details below.",
     "postType": "IMAGE",
     "topic": "Case Study",
-    "publishedAt": "2026-11-02T16:30:00.000Z",
-    "likes": 459,
-    "comments": 64,
+    "publishedAt": "2026-11-03T16:30:00.000Z",
+    "reach": 2928,
+    "likes": 70,
+    "comments": 16,
     "views": null,
-    "saves": 23
+    "saves": 4
   },
   {
     "postId": "post_048",
     "caption": "3 critical mistakes killing your AI application performance in 2026:\n1. Ignoring context window token limits\n2. Missing fallback providers\n3. Over-complicating agent architectures.",
     "postType": "IMAGE",
     "topic": "Product Launch",
-    "publishedAt": "2026-11-04T06:30:00.000Z",
-    "likes": 462,
-    "comments": 14,
+    "publishedAt": "2026-11-05T06:30:00.000Z",
+    "reach": 3010,
+    "likes": 105,
+    "comments": 4,
     "views": null,
-    "saves": 139
+    "saves": 32
   },
   {
     "postId": "post_049",
@@ -533,32 +581,35 @@
     "postType": "IMAGE",
     "topic": "Behind the Scenes",
     "publishedAt": "2026-11-10T18:15:00.000Z",
-    "likes": 295,
+    "reach": 2465,
+    "likes": 59,
     "comments": 0,
     "views": null,
-    "saves": 15
+    "saves": 3
   },
   {
     "postId": "post_050",
     "caption": "3 essential strategies to cut your enterprise LLM API bill by 60%:\n1. Semantic prompt caching\n2. Model tiering (Flash vs Pro)\n3. Strict token pruning on history.",
     "postType": "IMAGE",
     "topic": "Industry Myth",
-    "publishedAt": "2026-11-07T03:30:00.000Z",
-    "likes": 501,
-    "comments": 20,
+    "publishedAt": "2026-11-08T03:30:00.000Z",
+    "reach": 3284,
+    "likes": 111,
+    "comments": 6,
     "views": null,
-    "saves": 150
+    "saves": 33
   },
   {
     "postId": "post_051",
     "caption": "5 AI tools that will save your engineering team 25+ hours this week:\n1. Ollama for local testing\n2. Qdrant for hybrid vector search\n3. Pydantic/Zod for schema validation\n4. Langfuse for tracing\n5. ICIS for content analytics.",
     "postType": "IMAGE",
     "topic": "Tutorial",
-    "publishedAt": "2026-11-08T10:30:00.000Z",
-    "likes": 195,
-    "comments": 35,
+    "publishedAt": "2026-11-09T10:30:00.000Z",
+    "reach": 3421,
+    "likes": 82,
+    "comments": 17,
     "views": null,
-    "saves": 68
+    "saves": 29
   },
   {
     "postId": "post_052",
@@ -566,32 +617,35 @@
     "postType": "IMAGE",
     "topic": "Case Study",
     "publishedAt": "2026-11-12T21:15:00.000Z",
-    "likes": 323,
-    "comments": 42,
+    "reach": 4365,
+    "likes": 149,
+    "comments": 36,
     "views": null,
-    "saves": 16
+    "saves": 7
   },
   {
     "postId": "post_053",
     "caption": "Ever wonder why some AI agents get stuck in infinite reasoning loops? Here is the exact architecture fix we implemented.",
     "postType": "IMAGE",
     "topic": "Product Launch",
-    "publishedAt": "2026-11-11T07:30:00.000Z",
-    "likes": 243,
-    "comments": 10,
+    "publishedAt": "2026-11-12T07:30:00.000Z",
+    "reach": 3765,
+    "likes": 133,
+    "comments": 7,
     "views": null,
-    "saves": 12
+    "saves": 7
   },
   {
     "postId": "post_054",
     "caption": "5 architectural patterns every AI engineer must know:\n1. Router pattern\n2. Parallel tool fan-out\n3. Reflection & critique loops\n4. RAG with semantic reranking\n5. Deterministic fallback states.",
     "postType": "IMAGE",
     "topic": "Behind the Scenes",
-    "publishedAt": "2026-11-13T14:30:00.000Z",
-    "likes": 254,
-    "comments": 8,
+    "publishedAt": "2026-11-14T14:30:00.000Z",
+    "reach": 3831,
+    "likes": 133,
+    "comments": 5,
     "views": null,
-    "saves": 76
+    "saves": 40
   },
   {
     "postId": "post_055",
@@ -599,64 +653,70 @@
     "postType": "IMAGE",
     "topic": "Industry Myth",
     "publishedAt": "2026-11-17T20:15:00.000Z",
-    "likes": 411,
+    "reach": 4869,
+    "likes": 262,
     "comments": 8,
     "views": null,
-    "saves": 21
+    "saves": 13
   },
   {
     "postId": "post_056",
     "caption": "Are you still prompting your LLMs with free-form text instead of strict JSON schemas? Here is why that is costing you money.",
     "postType": "IMAGE",
     "topic": "Tutorial",
-    "publishedAt": "2026-11-16T11:30:00.000Z",
-    "likes": 304,
-    "comments": 52,
+    "publishedAt": "2026-11-17T11:30:00.000Z",
+    "reach": 4183,
+    "likes": 102,
+    "comments": 22,
     "views": null,
-    "saves": 106
+    "saves": 36
   },
   {
     "postId": "post_057",
     "caption": "Want to know how we reduced our Gemini API latency by 68% with deterministic caching? Dive into the details below.",
     "postType": "IMAGE",
     "topic": "Case Study",
-    "publishedAt": "2026-11-17T01:30:00.000Z",
-    "likes": 324,
-    "comments": 39,
+    "publishedAt": "2026-11-18T01:30:00.000Z",
+    "reach": 4322,
+    "likes": 114,
+    "comments": 21,
     "views": null,
-    "saves": 16
+    "saves": 6
   },
   {
     "postId": "post_058",
     "caption": "Product roadmap sync with the engineering team.",
     "postType": "IMAGE",
     "topic": "Product Launch",
-    "publishedAt": "2026-11-19T19:15:00.000Z",
-    "likes": 203,
-    "comments": 4,
+    "publishedAt": "2026-11-26T19:15:00.000Z",
+    "reach": 3429,
+    "likes": 75,
+    "comments": 2,
     "views": null,
-    "saves": 10
+    "saves": 4
   },
   {
     "postId": "post_059",
     "caption": "New feature preview dropping next week.",
     "postType": "IMAGE",
     "topic": "Behind the Scenes",
-    "publishedAt": "2026-11-20T15:30:00.000Z",
-    "likes": 149,
+    "publishedAt": "2026-11-21T15:30:00.000Z",
+    "reach": 2937,
+    "likes": 48,
     "comments": 0,
     "views": null,
-    "saves": 7
+    "saves": 2
   },
   {
     "postId": "post_060",
     "caption": "3 essential strategies to cut your enterprise LLM API bill by 60%:\n1. Semantic prompt caching\n2. Model tiering (Flash vs Pro)\n3. Strict token pruning on history.",
     "postType": "IMAGE",
     "topic": "Industry Myth",
-    "publishedAt": "2026-11-22T05:30:00.000Z",
-    "likes": 371,
-    "comments": 11,
+    "publishedAt": "2026-11-23T05:30:00.000Z",
+    "reach": 4652,
+    "likes": 162,
+    "comments": 6,
     "views": null,
-    "saves": 111
+    "saves": 49
   }
 ]

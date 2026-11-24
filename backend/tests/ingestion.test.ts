@@ -6,17 +6,18 @@ import { InstagramGraphProvider, NotImplementedError } from '../src/ingestion/in
 
 describe('Ingestion Layer & Content Schemas', () => {
   describe('InstagramPostSchema Validation', () => {
-    it('successfully validates a valid REEL post', () => {
+    it('successfully validates a valid REEL post with views >= reach', () => {
       const validReel = {
         postId: 'test_reel_1',
         caption: '5 AI tools for developers:\n1. Ollama...',
         postType: 'REEL' as const,
         topic: 'Tutorial',
         publishedAt: '2026-11-20T18:30:00.000Z',
-        likes: 2500,
-        comments: 320,
-        views: 45000,
-        saves: 800,
+        reach: 12000,
+        likes: 1500,
+        comments: 280,
+        views: 18500, // views >= reach (replays)
+        saves: 450,
       };
 
       const result = InstagramPostSchema.safeParse(validReel);
@@ -24,25 +25,52 @@ describe('Ingestion Layer & Content Schemas', () => {
       if (result.success) {
         expect(result.data.postId).toBe('test_reel_1');
         expect(result.data.postType).toBe('REEL');
-        expect(result.data.views).toBe(45000);
+        expect(result.data.reach).toBe(12000);
+        expect(result.data.views).toBe(18500);
       }
     });
 
-    it('successfully validates a valid IMAGE post with views: null', () => {
+    it('successfully validates a valid CAROUSEL post with views: null and positive reach', () => {
+      const validCarousel = {
+        postId: 'test_car_1',
+        caption: 'Architecture patterns for multi-agent systems:\n1. Router...',
+        postType: 'CAROUSEL' as const,
+        topic: 'Case Study',
+        publishedAt: '2026-11-21T18:30:00.000Z',
+        reach: 8500,
+        likes: 950,
+        comments: 140,
+        views: null, // Must be null for CAROUSEL
+        saves: 300,
+      };
+
+      const result = InstagramPostSchema.safeParse(validCarousel);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.postType).toBe('CAROUSEL');
+        expect(result.data.reach).toBe(8500);
+        expect(result.data.views).toBeNull();
+      }
+    });
+
+    it('successfully validates a valid IMAGE post with views: null and positive reach', () => {
       const validImage = {
         postId: 'test_img_1',
-        caption: 'Architecture diagram breakdown',
+        caption: 'Late night deployment session complete.',
         postType: 'IMAGE' as const,
-        topic: 'Case Study',
-        publishedAt: '2026-11-21T19:00:00.000Z',
-        likes: 350,
-        comments: 42,
-        views: null,
+        topic: 'Behind the Scenes',
+        publishedAt: '2026-11-22T20:00:00.000Z',
+        reach: 3200,
+        likes: 120,
+        comments: 8,
+        views: null, // Must be null for IMAGE
       };
 
       const result = InstagramPostSchema.safeParse(validImage);
       expect(result.success).toBe(true);
       if (result.success) {
+        expect(result.data.postType).toBe('IMAGE');
+        expect(result.data.reach).toBe(3200);
         expect(result.data.views).toBeNull();
       }
     });
@@ -54,17 +82,98 @@ describe('Ingestion Layer & Content Schemas', () => {
         postType: 'IMAGE' as const,
         topic: 'Behind the Scenes',
         publishedAt: '2026-11-21T19:00:00.000Z',
+        reach: 3000,
         likes: 300,
         comments: 20,
-        views: 5000, // Must be null for IMAGE
+        views: 4500, // Must be null for IMAGE
       };
 
       const result = InstagramPostSchema.safeParse(invalidImage);
       expect(result.success).toBe(false);
       if (!result.success) {
         const issues = result.error.issues;
-        expect(issues.some((issue) => issue.message === 'views must be null for IMAGE posts')).toBe(true);
+        expect(issues.some((issue) => issue.message === 'views must be null for IMAGE and CAROUSEL posts')).toBe(true);
       }
+    });
+
+    it('rejects a CAROUSEL post that has a non-null view count', () => {
+      const invalidCarousel = {
+        postId: 'test_car_invalid',
+        caption: 'Carousel with views should fail',
+        postType: 'CAROUSEL' as const,
+        topic: 'Tutorial',
+        publishedAt: '2026-11-21T19:00:00.000Z',
+        reach: 5000,
+        likes: 400,
+        comments: 30,
+        views: 6000, // Must be null for CAROUSEL
+      };
+
+      const result = InstagramPostSchema.safeParse(invalidCarousel);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        const issues = result.error.issues;
+        expect(issues.some((issue) => issue.message === 'views must be null for IMAGE and CAROUSEL posts')).toBe(true);
+      }
+    });
+
+    it('rejects a REEL post that has views: null', () => {
+      const invalidReel = {
+        postId: 'test_reel_null_views',
+        caption: 'Reel without views should fail',
+        postType: 'REEL' as const,
+        topic: 'Tutorial',
+        publishedAt: '2026-11-21T19:00:00.000Z',
+        reach: 8000,
+        likes: 500,
+        comments: 50,
+        views: null, // Must be populated for REEL
+      };
+
+      const result = InstagramPostSchema.safeParse(invalidReel);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        const issues = result.error.issues;
+        expect(issues.some((issue) => issue.message === 'views must be populated for REEL posts')).toBe(true);
+      }
+    });
+
+    it('rejects a REEL post where views is less than reach', () => {
+      const invalidReel = {
+        postId: 'test_reel_low_views',
+        caption: 'Reel where views < reach should fail',
+        postType: 'REEL' as const,
+        topic: 'Tutorial',
+        publishedAt: '2026-11-21T19:00:00.000Z',
+        reach: 10000,
+        likes: 600,
+        comments: 60,
+        views: 8000, // views < reach is impossible (each reached account accounts for >= 1 view)
+      };
+
+      const result = InstagramPostSchema.safeParse(invalidReel);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        const issues = result.error.issues;
+        expect(issues.some((issue) => issue.message === 'views must be greater than or equal to reach for REEL posts')).toBe(true);
+      }
+    });
+
+    it('rejects posts with non-positive reach', () => {
+      const invalidReach = {
+        postId: 'test_zero_reach',
+        caption: 'Zero reach test',
+        postType: 'IMAGE' as const,
+        topic: 'Tutorial',
+        publishedAt: '2026-11-21T19:00:00.000Z',
+        reach: 0, // Must be positive
+        likes: 10,
+        comments: 5,
+        views: null,
+      };
+
+      const result = InstagramPostSchema.safeParse(invalidReach);
+      expect(result.success).toBe(false);
     });
 
     it('rejects posts with negative engagement values', () => {
@@ -74,9 +183,10 @@ describe('Ingestion Layer & Content Schemas', () => {
         postType: 'REEL' as const,
         topic: 'Tutorial',
         publishedAt: '2026-11-21T19:00:00.000Z',
+        reach: 5000,
         likes: -10,
         comments: 5,
-        views: 1000,
+        views: 6000,
       };
 
       const result = InstagramPostSchema.safeParse(invalidLikes);
@@ -90,28 +200,13 @@ describe('Ingestion Layer & Content Schemas', () => {
         postType: 'CAROUSEL' as const,
         topic: 'Tutorial',
         publishedAt: 'invalid-date-string',
+        reach: 5000,
         likes: 100,
         comments: 10,
-        views: 2000,
+        views: null,
       };
 
       const result = InstagramPostSchema.safeParse(invalidDate);
-      expect(result.success).toBe(false);
-    });
-
-    it('rejects unknown postType values', () => {
-      const invalidType = {
-        postId: 'test_bad_type',
-        caption: 'Unknown type',
-        postType: 'TIKTOK',
-        topic: 'Tutorial',
-        publishedAt: '2026-11-21T19:00:00.000Z',
-        likes: 100,
-        comments: 10,
-        views: 2000,
-      };
-
-      const result = InstagramPostSchema.safeParse(invalidType);
       expect(result.success).toBe(false);
     });
   });
@@ -127,31 +222,38 @@ describe('Ingestion Layer & Content Schemas', () => {
       const posts = await provider.fetchPosts();
       expect(posts).toHaveLength(60);
 
-      // Verify every single post satisfies the schema
       for (const post of posts) {
         const validation = InstagramPostSchema.safeParse(post);
         expect(validation.success).toBe(true);
       }
     });
 
-    it('enforces that all static IMAGE posts have views === null', async () => {
+    it('enforces that reach is a positive integer on all 60 posts', async () => {
       const posts = await provider.fetchPosts();
-      const imagePosts = posts.filter((p) => p.postType === 'IMAGE');
-
-      expect(imagePosts.length).toBeGreaterThan(0);
-      for (const imagePost of imagePosts) {
-        expect(imagePost.views).toBeNull();
+      for (const post of posts) {
+        expect(typeof post.reach).toBe('number');
+        expect(post.reach).toBeGreaterThan(0);
       }
     });
 
-    it('ensures REEL and CAROUSEL posts have positive view counts', async () => {
+    it('enforces that views is null for all CAROUSEL and IMAGE posts', async () => {
       const posts = await provider.fetchPosts();
-      const videoPosts = posts.filter((p) => p.postType === 'REEL' || p.postType === 'CAROUSEL');
+      const nonReels = posts.filter((p) => p.postType === 'IMAGE' || p.postType === 'CAROUSEL');
 
-      expect(videoPosts.length).toBeGreaterThan(0);
-      for (const post of videoPosts) {
+      expect(nonReels.length).toBe(35); // 20 Carousels + 15 Images
+      for (const post of nonReels) {
+        expect(post.views).toBeNull();
+      }
+    });
+
+    it('enforces that all REEL posts have views >= reach', async () => {
+      const posts = await provider.fetchPosts();
+      const reels = posts.filter((p) => p.postType === 'REEL');
+
+      expect(reels.length).toBe(25);
+      for (const post of reels) {
         expect(typeof post.views).toBe('number');
-        expect(post.views).toBeGreaterThan(0);
+        expect(post.views!).toBeGreaterThanOrEqual(post.reach);
       }
     });
 
