@@ -43,3 +43,36 @@ export const InstagramPostSchema = z
   });
 
 export type InstagramPost = z.infer<typeof InstagramPostSchema>;
+
+// Strategy & Recommendation Schemas
+export const RecommendationCategoryEnum = z.enum([
+  'FORMAT_DOUBLE_DOWN',
+  'CONTENT_THEME',
+  'HOOK_AND_CAPTION',
+  'POSTING_SCHEDULE',
+  'UNDERPERFORMING_FIX',
+]);
+export type RecommendationCategory = z.infer<typeof RecommendationCategoryEnum>;
+
+export const ExpectedImpactEnum = z.enum(['HIGH', 'MEDIUM']);
+export type ExpectedImpact = z.infer<typeof ExpectedImpactEnum>;
+
+export const RecommendationItemSchema = z.object({
+  id: z.string().min(1, 'id must not be empty'),
+  title: z.string().min(1, 'title must not be empty'),
+  category: RecommendationCategoryEnum,
+  recommendedFormat: PostTypeEnum,
+  suggestedTopic: z.string().min(1, 'suggestedTopic must not be empty'),
+  actionableBrief: z.string().min(1, 'actionableBrief must not be empty'),
+  supportingPostIds: z.array(z.string()).min(1, 'supportingPostIds must contain at least 1 postId'),
+  dataEvidence: z.string().min(1, 'dataEvidence must not be empty'),
+  expectedImpact: ExpectedImpactEnum,
+});
+export type RecommendationItem = z.infer<typeof RecommendationItemSchema>;
+
+export const ContentStrategyResponseSchema = z.object({
+  executiveSummary: z.string().min(1, 'executiveSummary must not be empty'),
+  keyPatterns: z.array(z.string()).min(1, 'keyPatterns must contain at least 1 item'),
+  recommendations: z.array(RecommendationItemSchema).min(1, 'recommendations must contain at least 1 item'),
+});
+export type ContentStrategyResponse = z.infer<typeof ContentStrategyResponseSchema>;
