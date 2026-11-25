@@ -22,6 +22,27 @@ export interface EnrichedPost extends InstagramPost {
   hasQuestionHook: boolean;
 }
 
+export function enrichPost(post: InstagramPost): EnrichedPost {
+  const trimmedCaption = post.caption.trim();
+  const weightedEngagementRate =
+    post.reach > 0
+      ? Number((((post.likes + post.comments * 3) / post.reach) * 100).toFixed(2))
+      : 0;
+  const captionLength = post.caption.length;
+
+  return {
+    ...post,
+    weightedEngagementRate,
+    replayRatio:
+      post.views === null || post.reach <= 0
+        ? null
+        : Number((post.views / post.reach).toFixed(2)),
+    captionLengthBucket:
+      captionLength < 80 ? "SHORT" : captionLength <= 200 ? "MEDIUM" : "LONG",
+    hasQuestionHook: /^[^.!\n]*\?/.test(trimmedCaption),
+  };
+}
+
 export interface OverviewMetrics {
   totalPosts: number;
   avgWeightedEngagementRate: number;

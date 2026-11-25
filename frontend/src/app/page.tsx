@@ -20,12 +20,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { CommandMenu } from "@/components/shell/CommandMenu";
 import { Sidebar, type AppView } from "@/components/shell/Sidebar";
 import { TopHeader } from "@/components/shell/TopHeader";
+import { PostInspectorSheet } from "@/components/inspector/PostInspectorSheet";
+import { PostFeedView } from "@/components/views/PostFeedView";
 import {
+  enrichPost,
   generateRecommendations,
   getAnalytics,
   getPosts,
   type AnalyticsReport,
   type ContentStrategyResponse,
+  type EnrichedPost,
   type InstagramPost,
   type PostType,
 } from "@/lib/api";
@@ -70,12 +74,6 @@ function getBestWindow(report: AnalyticsReport | null): string {
 
 function formatRate(rate: number): string {
   return `${rate.toFixed(2)}%`;
-}
-
-function formatDate(date: string): string {
-  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(
-    new Date(date),
-  );
 }
 
 function KpiCard({
@@ -126,10 +124,14 @@ function StrategyContent({
   strategy,
   onGenerate,
   isGenerating,
+  postsById,
+  onSelectPost,
 }: {
   strategy: ContentStrategyResponse | null;
   onGenerate: () => void;
   isGenerating: boolean;
+  postsById: Map<string, EnrichedPost>;
+  onSelectPost: (post: EnrichedPost) => void;
 }) {
   if (!strategy) {
     return (
@@ -217,6 +219,24 @@ function StrategyContent({
               <p className="mt-3 border-t border-[#EFEFEF] pt-3 text-[10px] leading-4 text-[#838994]">
                 {recommendation.dataEvidence}
               </p>
+              {recommendation.supportingPostIds.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {recommendation.supportingPostIds.map((postId) => {
+                    const citedPost = postsById.get(postId);
+                    return citedPost ? (
+                      <button
+                        key={postId}
+                        type="button"
+                        onClick={() => onSelectPost(citedPost)}
+                        className="rounded border border-[#E6E6E6] bg-[#FAFAFB] px-1.5 py-1 font-mono text-[9px] text-[#686E79] transition-colors hover:border-[#C8CCEF] hover:bg-[#F0F1FC] hover:text-[#535EB8]"
+                        aria-label={`Inspect cited post ${postId}`}
+                      >
+                        {postId}
+                      </button>
+                    ) : null;
+                  })}
+                </div>
+              )}
             </CardContent>
           </Card>
         ))}
@@ -225,7 +245,13 @@ function StrategyContent({
   );
 }
 
-function AnalyticsContent({ report }: { report: AnalyticsReport | null }) {
+function AnalyticsContent({
+  report,
+  onSelectPost,
+}: {
+  report: AnalyticsReport | null;
+  onSelectPost: (post: EnrichedPost) => void;
+}) {
   if (!report) {
     return <EmptyPanel message="Analytics will appear here when the backend is available." />;
   }
@@ -237,8 +263,9 @@ function AnalyticsContent({ report }: { report: AnalyticsReport | null }) {
   );
 
   return (
-    <div className="grid gap-4 xl:grid-cols-2">
-      <Card className="rounded-lg border border-[#E6E6E6] py-0 shadow-none">
+    <div className="space-y-4">
+      <div className="grid gap-4 xl:grid-cols-2">
+        <Card className="rounded-lg border border-[#E6E6E6] py-0 shadow-none">
         <CardHeader className="px-4 pb-0 pt-4">
           <CardTitle className="text-[12px] font-semibold">Format performance</CardTitle>
           <p className="text-[10px] text-[#858B95]">Weighted engagement rate by post format</p>
@@ -266,8 +293,8 @@ function AnalyticsContent({ report }: { report: AnalyticsReport | null }) {
             </div>
           ))}
         </CardContent>
-      </Card>
-      <Card className="rounded-lg border border-[#E6E6E6] py-0 shadow-none">
+        </Card>
+        <Card className="rounded-lg border border-[#E6E6E6] py-0 shadow-none">
         <CardHeader className="px-4 pb-0 pt-4">
           <CardTitle className="text-[12px] font-semibold">Audience timing</CardTitle>
           <p className="text-[10px] text-[#858B95]">Engagement by time of day</p>
@@ -292,98 +319,63 @@ function AnalyticsContent({ report }: { report: AnalyticsReport | null }) {
             ))
           )}
         </CardContent>
-      </Card>
+        </Card>
+      </div>
+      <div className="grid gap-4 xl:grid-cols-2">
+        <PostRankingList
+          title="Top performing posts"
+          posts={report.topPosts}
+          onSelectPost={onSelectPost}
+        />
+        <PostRankingList
+          title="Needs attention"
+          posts={report.worstPosts}
+          onSelectPost={onSelectPost}
+        />
+      </div>
     </div>
   );
 }
 
-function PostFeedContent({
+function PostRankingList({
+  title,
   posts,
-  filter,
-  onFilterChange,
-  loading,
+  onSelectPost,
 }: {
-  posts: InstagramPost[];
-  filter: PostType | null;
-  onFilterChange: (filter: PostType | null) => void;
-  loading: boolean;
+  title: string;
+  posts: EnrichedPost[];
+  onSelectPost: (post: EnrichedPost) => void;
 }) {
-  const visiblePosts = useMemo(
-    () => [...posts].sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt)),
-    [posts],
-  );
-
   return (
-    <Card className="rounded-lg border border-[#E6E6E6] py-0 shadow-none">
-      <CardHeader className="flex flex-row items-center justify-between gap-4 px-4 pb-3 pt-4">
-        <div>
-          <CardTitle className="text-[12px] font-semibold">Recent posts</CardTitle>
-          <p className="mt-1 text-[10px] text-[#858B95]">
-            {filter ? `Filtered by ${filter}` : "Your latest published content"}
-          </p>
-        </div>
-        <select
-          value={filter ?? "ALL"}
-          onChange={(event) =>
-            onFilterChange(event.target.value === "ALL" ? null : (event.target.value as PostType))
-          }
-          aria-label="Filter posts by format"
-          className="h-8 rounded-md border border-[#E6E6E6] bg-white px-2.5 text-[10px] text-[#555B66] outline-none focus:border-[#5E6AD2]"
-        >
-          <option value="ALL">All formats</option>
-          <option value="REEL">Reels</option>
-          <option value="CAROUSEL">Carousels</option>
-          <option value="IMAGE">Images</option>
-        </select>
-      </CardHeader>
-      <div className="border-t border-[#E6E6E6]">
-        {loading ? (
-          <div className="space-y-3 p-4">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-          </div>
-        ) : visiblePosts.length === 0 ? (
-          <div className="p-8 text-center text-[11px] text-[#858B95]">
-            No posts match this format.
-          </div>
-        ) : (
-          visiblePosts.slice(0, 12).map((post, index) => (
-            <div
-              key={post.postId}
-              className={`grid grid-cols-[minmax(0,1fr)_94px_72px_78px] items-center gap-3 px-4 py-3 ${
-                index < visiblePosts.length - 1 ? "border-b border-[#F0F0F0]" : ""
-              }`}
-            >
-              <div className="min-w-0">
-                <p className="truncate text-[11px] font-medium text-[#333843]">
-                  {post.caption || "Untitled post"}
-                </p>
-                <p className="mt-1 truncate text-[10px] text-[#898F99]">
-                  {post.topic} · <span className="font-mono">{post.postId}</span>
-                </p>
-              </div>
-              <Badge
-                variant="outline"
-                className="w-fit border-[#E6E6E6] text-[9px] font-medium text-[#666C76]"
-              >
-                {post.postType}
-              </Badge>
-              <span className="text-right font-mono text-[10px] text-[#626873]">
-                {numberFormatter.format(post.reach)}
-              </span>
-              <span className="text-right text-[10px] text-[#858B95]">
-                {formatDate(post.publishedAt)}
-              </span>
-            </div>
-          ))
-        )}
+    <section className="overflow-hidden rounded-lg border border-[#E6E6E6] bg-white">
+      <div className="border-b border-[#ECECEC] px-4 py-3">
+        <h3 className="text-[11px] font-semibold text-[#343943]">{title}</h3>
       </div>
-      <div className="flex items-center justify-between border-t border-[#E6E6E6] px-4 py-2.5 text-[9px] text-[#9298A2]">
-        <span>Reach</span>
-        <span>{visiblePosts.length} posts loaded</span>
-      </div>
-    </Card>
+      {posts.length === 0 ? (
+        <p className="px-4 py-5 text-[10px] text-[#858B95]">No posts to show.</p>
+      ) : (
+        posts.map((post) => (
+          <button
+            key={post.postId}
+            type="button"
+            onClick={() => onSelectPost(post)}
+            className="flex w-full items-center justify-between gap-3 border-b border-[#F0F0F0] px-4 py-2.5 text-left last:border-b-0 hover:bg-zinc-50/90"
+          >
+            <span className="min-w-0">
+              <span className="block truncate text-[10px] font-medium text-[#3A3F49]">
+                {post.caption || "No caption"}
+              </span>
+              <span className="mt-1 block font-mono text-[9px] text-[#898F99]">
+                {post.postId} · {post.postType} · {post.topic}
+              </span>
+            </span>
+            <span className="shrink-0 font-mono text-[10px] font-semibold text-[#4F5BC4]">
+              {formatRate(post.weightedEngagementRate)}
+            </span>
+          </button>
+        ))
+      )}
+    </section>
   );
 }
 
@@ -403,9 +395,9 @@ export default function Home() {
   const [posts, setPosts] = useState<InstagramPost[]>([]);
   const [report, setReport] = useState<AnalyticsReport | null>(null);
   const [strategy, setStrategy] = useState<ContentStrategyResponse | null>(null);
+  const [selectedPost, setSelectedPost] = useState<EnrichedPost | null>(null);
   const [postFilter, setPostFilter] = useState<PostType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isFiltering, setIsFiltering] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [strategyError, setStrategyError] = useState<string | null>(null);
@@ -432,19 +424,17 @@ export default function Home() {
     };
   }, []);
 
-  const handleFormatChange = useCallback(async (format: PostType | null) => {
+  const postsById = useMemo(() => {
+    const enrichedPosts = new Map(posts.map((post) => [post.postId, enrichPost(post)]));
+    for (const post of [...(report?.topPosts ?? []), ...(report?.worstPosts ?? [])]) {
+      enrichedPosts.set(post.postId, post);
+    }
+    return enrichedPosts;
+  }, [posts, report]);
+
+  const handleFormatChange = useCallback((format: PostType | null) => {
     setPostFilter(format);
     setActiveView("Post Feed");
-    setIsFiltering(true);
-    try {
-      const filteredPosts = await getPosts(format ? { postType: format } : undefined);
-      setPosts(filteredPosts);
-      setError(null);
-    } catch (cause: unknown) {
-      setError(cause instanceof Error ? cause.message : "Unable to filter posts.");
-    } finally {
-      setIsFiltering(false);
-    }
   }, []);
 
   const handleGenerateStrategy = useCallback(async () => {
@@ -575,6 +565,8 @@ export default function Home() {
                       strategy={strategy}
                       onGenerate={handleGenerateStrategy}
                       isGenerating={isGenerating}
+                      postsById={postsById}
+                      onSelectPost={setSelectedPost}
                     />
                   </>
                 )}
@@ -590,7 +582,7 @@ export default function Home() {
                         <Skeleton className="h-64 rounded-lg" />
                       </div>
                     ) : (
-                      <AnalyticsContent report={report} />
+                      <AnalyticsContent report={report} onSelectPost={setSelectedPost} />
                     )}
                   </>
                 )}
@@ -600,11 +592,12 @@ export default function Home() {
                       title="Post performance"
                       detail="Filter and review recent Instagram content"
                     />
-                    <PostFeedContent
-                      posts={posts}
-                      filter={postFilter}
-                      onFilterChange={handleFormatChange}
-                      loading={isLoading || isFiltering}
+                    <PostFeedView
+                      posts={[...postsById.values()]}
+                      selectedFormat={postFilter}
+                      onFormatChange={handleFormatChange}
+                      onSelectPost={setSelectedPost}
+                      loading={isLoading}
                     />
                   </>
                 )}
@@ -628,6 +621,13 @@ export default function Home() {
         onViewChange={setActiveView}
         onFormatChange={handleFormatChange}
         onGenerateStrategy={handleGenerateStrategy}
+      />
+      <PostInspectorSheet
+        post={selectedPost}
+        onOpenChange={(open) => {
+          if (!open) setSelectedPost(null);
+        }}
+        recommendations={strategy?.recommendations}
       />
     </div>
   );
