@@ -5,7 +5,6 @@ import {
   ArrowUpRight,
   CalendarClock,
   ChartNoAxesColumnIncreasing,
-  Clock3,
   Heart,
   MessageCircle,
   Sparkles,
@@ -21,6 +20,7 @@ import { CommandMenu } from "@/components/shell/CommandMenu";
 import { Sidebar, type AppView } from "@/components/shell/Sidebar";
 import { TopHeader } from "@/components/shell/TopHeader";
 import { PostInspectorSheet } from "@/components/inspector/PostInspectorSheet";
+import { AnalyticsView } from "@/components/views/AnalyticsView";
 import { PostFeedView } from "@/components/views/PostFeedView";
 import {
   enrichPost,
@@ -245,140 +245,6 @@ function StrategyContent({
   );
 }
 
-function AnalyticsContent({
-  report,
-  onSelectPost,
-}: {
-  report: AnalyticsReport | null;
-  onSelectPost: (post: EnrichedPost) => void;
-}) {
-  if (!report) {
-    return <EmptyPanel message="Analytics will appear here when the backend is available." />;
-  }
-
-  const formats = Object.values(report.formatBreakdown);
-  const maxRate = Math.max(...formats.map((format) => format.avgWeightedEngagementRate), 0);
-  const populatedBuckets = report.temporalTrends.byHourBucket.filter(
-    (bucket) => bucket.postCount > 0,
-  );
-
-  return (
-    <div className="space-y-4">
-      <div className="grid gap-4 xl:grid-cols-2">
-        <Card className="rounded-lg border border-[#E6E6E6] py-0 shadow-none">
-        <CardHeader className="px-4 pb-0 pt-4">
-          <CardTitle className="text-[12px] font-semibold">Format performance</CardTitle>
-          <p className="text-[10px] text-[#858B95]">Weighted engagement rate by post format</p>
-        </CardHeader>
-        <CardContent className="space-y-4 px-4 pb-4 pt-5">
-          {formats.map((format) => (
-            <div key={format.format}>
-              <div className="mb-1.5 flex items-center justify-between text-[11px]">
-                <span className="font-medium text-[#414651]">{format.format}</span>
-                <span className="font-mono text-[#626873]">
-                  {formatRate(format.avgWeightedEngagementRate)}
-                </span>
-              </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-[#F0F1F3]">
-                <div
-                  className="h-full rounded-full bg-[#6974D6]"
-                  style={{
-                    width: `${
-                      maxRate > 0 ? (format.avgWeightedEngagementRate / maxRate) * 100 : 0
-                    }%`,
-                  }}
-                />
-              </div>
-              <p className="mt-1 text-[9px] text-[#969BA3]">{format.postCount} posts</p>
-            </div>
-          ))}
-        </CardContent>
-        </Card>
-        <Card className="rounded-lg border border-[#E6E6E6] py-0 shadow-none">
-        <CardHeader className="px-4 pb-0 pt-4">
-          <CardTitle className="text-[12px] font-semibold">Audience timing</CardTitle>
-          <p className="text-[10px] text-[#858B95]">Engagement by time of day</p>
-        </CardHeader>
-        <CardContent className="space-y-3 px-4 pb-4 pt-4">
-          {populatedBuckets.length === 0 ? (
-            <p className="py-3 text-[11px] text-[#858B95]">No timing data available yet.</p>
-          ) : (
-            populatedBuckets.map((bucket) => (
-              <div
-                key={bucket.bucket}
-                className="flex items-center justify-between rounded-md border border-[#EFEFEF] px-3 py-2.5"
-              >
-                <div className="flex items-center gap-2.5">
-                  <Clock3 size={14} className="text-[#8B91A0]" />
-                  <span className="text-[11px] text-[#414651]">{bucket.bucket}</span>
-                </div>
-                <span className="font-mono text-[11px] font-medium text-[#414651]">
-                  {formatRate(bucket.avgWeightedEngagementRate)}
-                </span>
-              </div>
-            ))
-          )}
-        </CardContent>
-        </Card>
-      </div>
-      <div className="grid gap-4 xl:grid-cols-2">
-        <PostRankingList
-          title="Top performing posts"
-          posts={report.topPosts}
-          onSelectPost={onSelectPost}
-        />
-        <PostRankingList
-          title="Needs attention"
-          posts={report.worstPosts}
-          onSelectPost={onSelectPost}
-        />
-      </div>
-    </div>
-  );
-}
-
-function PostRankingList({
-  title,
-  posts,
-  onSelectPost,
-}: {
-  title: string;
-  posts: EnrichedPost[];
-  onSelectPost: (post: EnrichedPost) => void;
-}) {
-  return (
-    <section className="overflow-hidden rounded-lg border border-[#E6E6E6] bg-white">
-      <div className="border-b border-[#ECECEC] px-4 py-3">
-        <h3 className="text-[11px] font-semibold text-[#343943]">{title}</h3>
-      </div>
-      {posts.length === 0 ? (
-        <p className="px-4 py-5 text-[10px] text-[#858B95]">No posts to show.</p>
-      ) : (
-        posts.map((post) => (
-          <button
-            key={post.postId}
-            type="button"
-            onClick={() => onSelectPost(post)}
-            className="flex w-full items-center justify-between gap-3 border-b border-[#F0F0F0] px-4 py-2.5 text-left last:border-b-0 hover:bg-zinc-50/90"
-          >
-            <span className="min-w-0">
-              <span className="block truncate text-[10px] font-medium text-[#3A3F49]">
-                {post.caption || "No caption"}
-              </span>
-              <span className="mt-1 block font-mono text-[9px] text-[#898F99]">
-                {post.postId} · {post.postType} · {post.topic}
-              </span>
-            </span>
-            <span className="shrink-0 font-mono text-[10px] font-semibold text-[#4F5BC4]">
-              {formatRate(post.weightedEngagementRate)}
-            </span>
-          </button>
-        ))
-      )}
-    </section>
-  );
-}
-
 function EmptyPanel({ message }: { message: string }) {
   return (
     <Card className="rounded-lg border border-dashed border-[#DADDE2] bg-white py-0 shadow-none">
@@ -581,8 +447,10 @@ export default function Home() {
                         <Skeleton className="h-64 rounded-lg" />
                         <Skeleton className="h-64 rounded-lg" />
                       </div>
+                    ) : report ? (
+                      <AnalyticsView report={report} onSelectPost={setSelectedPost} />
                     ) : (
-                      <AnalyticsContent report={report} onSelectPost={setSelectedPost} />
+                      <EmptyPanel message="Analytics will appear here when the backend is available." />
                     )}
                   </>
                 )}
