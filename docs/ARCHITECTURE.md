@@ -1,175 +1,114 @@
-# Architecture Specification
-## Instagram Content Intelligence System (ICIS)
+# ICIS Architecture
 
-### 1. System Overview & Component Topology
+## System flow
 
-```
-+---------------------------------------------------------------------------------------+
-|                                    FRONTEND (Next.js)                                 |
-|   App Router | Tailwind CSS | shadcn/ui (Dark Mode Default) | TypeScript UI Primitives |
-+---------------------------------------------------------------------------------------+
-                                            |
-                                      REST / JSON
-                                            v
-+---------------------------------------------------------------------------------------+
-|                                   BACKEND (Express API)                               |
-|                                                                                       |
-|   +-------------------------------------------------------------------------------+   |
-|   | 1. HTTP / Route Layer (src/routes/)                                           |   |
-|   |    - Request validation via Zod schemas                                       |   |
-|   |    - HTTP status mapping and error handling                                   |   |
-|   +-------------------------------------------------------------------------------+   |
-|           |                                       |                                   |
-|           v                                       v                                   |
-|   +-------------------------------+       +---------------------------------------+   |
-|   | 2. Ingestion Layer            |       | 3. Analytics Layer (src/analytics/)   |   |
-|   |    (src/ingestion/)           | ----> |    - Pure deterministic math          |   |
-|   |    - IContentProvider         |       |    - Zero Express / zero LLM imports  |   |
-|   |    - Mock / Graph API adapter |       |    - Weighted Engagement calculations |   |
-|   |    - Schema normalization     |       +---------------------------------------+   |
-|   +-------------------------------+                           |                       |
-|                                                               v                       |
-|                                           +---------------------------------------+   |
-|                                           | 4. Intelligence Layer                 |   |
-|                                           |    (src/intelligence/)                |   |
-|                                           |    - Google GenAI SDK (@google/genai) |   |
-|                                           |    - gemini-2.5-flash                 |   |
-|                                           |    - Structured JSON output schemas   |   |
-|                                           +---------------------------------------+   |
-+---------------------------------------------------------------------------------------+
+ICIS is a layered Instagram content intelligence prototype. The frontend presents
+the product and collects user actions; the Express API coordinates providers,
+deterministic analytics, and AI synthesis.
+
+```mermaid
+flowchart LR
+    U[User] --> F[Next.js App Router<br/>Linear-inspired Light Mode<br/>Tailwind CSS + shadcn/ui]
+    F -->|REST / JSON| R[Express REST API]
+    R -->|IContentProvider.fetchPosts| I[Ingestion<br/>Simulated JSON provider]
+    I -->|Zod-validated InstagramPost[]| R
+    R --> A[Deterministic AnalyticsService]
+    A -->|AnalyticsReport| R
+    R --> G[Gemini intelligence<br/>@google/genai · gemini-2.5-flash]
+    G -->|JSON responseSchema| R
+    R -->|JSON response| F
 ```
 
----
+### Request lifecycle
 
-### 2. Architectural Layer Boundary Specifications
+1. The Next.js App Router dashboard fetches posts and analytics from the Express
+   API. Its three views are AI Strategist, Analytics, and Post Feed. Interactive
+   navigation includes a `⌘K`/`Ctrl+K` command menu and a shared slide-over post
+   inspector.
+2. `GET /api/posts` asks the configured `IContentProvider` for posts. The
+   `SimulatedInstagramProvider` reads the sample JSON and validates each record
+   with `InstagramPostSchema` before returning it.
+3. `GET /api/analytics` passes provider posts to the deterministic analytics
+   service, which returns an `AnalyticsReport`.
+4. `POST /api/recommendations` uses the same provider and analytics report,
+   supplies the verified data to Gemini, validates the returned strategy, and
+   returns JSON to the frontend.
 
-#### 2.1 Ingestion Layer (`backend/src/ingestion/`)
-- **Responsibility**: Interface with external sources (Instagram Basic Display API, Instagram Graph API, or mock JSON datasets) and normalize external schemas into ICIS domain models.
-- **Core Interface**:
-  ```typescript
-  export interface IContentProvider {
-    fetchPosts(limit?: number): Promise<NormalizedPost[]>;
-    fetchAccountProfile(): Promise<AccountProfile>;
-  }
-  ```
-- **Rules**:
-  - Must never import `express`, HTTP response handlers, or Gemini AI SDKs.
-  - Must validate all raw payloads using `zod`.
-  - Must normalize missing or `null` view counts on static posts to `null` (leaving fallback logic to analytics).
+## Backend boundaries
 
-#### 2.2 Analytics Layer (`backend/src/analytics/`)
-- **Responsibility**: Pure mathematical and statistical processing.
-- **Constraints**:
-  - **Zero side-effects**: Given the same inputs, functions always produce identical outputs.
-  - **Zero Express or HTTP imports**: Cannot access `req`, `res`, or headers.
-  - **Zero LLM imports**: Cannot call Google Gemini or any generative model.
-- **Primary Metrics**:
-  - Single-post Weighted Engagement Rate.
-  - Aggregate metrics: mean, median, standard deviation, format breakdown, and quartile segmentation (top 10% vs bottom 10%).
+| Layer | Responsibility | Important boundary |
+| --- | --- | --- |
+| `backend/src/ingestion/` | Fetch and normalize provider data through `IContentProvider`. | Provider payloads are validated against the domain Zod schema; this layer does not own HTTP routes, analytics, or LLM calls. |
+| `backend/src/analytics/` | Deterministic enrichment, format/topic comparisons, temporal and caption trends, and post rankings. | Pure business calculations; no Express or generative-model dependencies. |
+| `backend/src/intelligence/` | Evidence-grounded content-strategy synthesis with the official `@google/genai` SDK. | Uses `gemini-2.5-flash`, `GOOGLE_GENAI_API_VERSION=v1beta`, and a concrete JSON response schema. |
+| `backend/src/routes/` | HTTP endpoints, query validation, status mapping, and service coordination. | Route handlers delegate calculations and AI synthesis to their domain layers. |
 
-#### 2.3 Intelligence Layer (`backend/src/intelligence/`)
-- **Responsibility**: Contextual synthesis and strategic recommendation generation.
-- **SDK**: Official `@google/genai` (model: `gemini-2.5-flash`).
-- **Constraints**:
-  - Structured output required: `responseMimeType: "application/json"` with an explicit `responseSchema`.
-  - Grounded prompts: The prompt receives normalized post summaries and deterministic metrics calculated by the Analytics layer.
-  - Prohibits deprecated `@google/generative-ai` package.
+`IContentProvider` currently exposes `fetchPosts(): Promise<InstagramPost[]>`.
+The simulated provider is the active implementation. `InstagramGraphProvider`
+is an adapter stub, not a live Meta integration.
 
-#### 2.4 Route Layer (`backend/src/routes/`)
-- **Responsibility**: Request routing, query/body validation with Zod, and response formatting.
-- **Rules**:
-  - Controllers only coordinate calls between Ingestion, Analytics, and Intelligence.
-  - No business logic or math formulas defined inside route callbacks.
+## Analytics and metric definitions
 
----
+The cross-format Weighted Engagement Rate (WER) uses reach as its denominator
+for Reels, Carousels, and Images:
 
-### 3. Mathematical Specification: Weighted Engagement Rate
-
-#### 3.1 Primary Cross-Format Metric: Weighted Engagement Rate by Reach
-For any given post $p \in \{\text{REEL}, \text{CAROUSEL}, \text{IMAGE}\}$:
-
-$$\text{WER}(p) = \left( \frac{\text{likes}_p + 3 \times \text{comments}_p}{\text{reach}_p} \right) \times 100$$
-
-#### 3.2 Uniform Scale Rationale & Metric Decoupling
-1. **Apples-to-Apples Cross-Format Comparability**:
-   - In earlier iterations, conditional denominators (using `views` for Reels and an account follower baseline for static Images) created severe metric scale distortion. A Reel evaluated against 50,000 views and a static post evaluated against 10,000 baseline followers yielded non-comparable percentage figures.
-   - `reach` measures unique accounts exposed to the post and is universally reported across Reels, Carousels, and Static Images. Using `reach` provides a single, uniform denominator across all formats on the exact same scale.
-
-2. **Decoupling Video Metrics (`views` and `replayRatio`)**:
-   - `views` represents total video impressions/plays. It is populated for `REEL` posts and `null` for static `IMAGE` and non-video `CAROUSEL` posts.
-   - Rather than polluting the cross-format engagement denominator, `views` is isolated as a video-specific metric.
-   - For `REEL` posts, ICIS computes:
-     $$\text{replayRatio}(p) = \frac{\text{views}_p}{\text{reach}_p}$$
-     A high `replayRatio` ($> 1.0$) demonstrates high retention and audience re-watching behavior.
-
-3. **Universal Fallback Handling (`ACCOUNT_FOLLOWER_COUNT`)**:
-   - In scenarios where an external provider does not supply `reach` (e.g., basic permission tiers), ICIS uses `followerCount` (via `ACCOUNT_FOLLOWER_COUNT`) applied **uniformly to ALL posts** in the dataset:
-     $$\text{WER}_{\text{fallback}}(p) = \left( \frac{\text{likes}_p + 3 \times \text{comments}_p}{\text{ACCOUNT\_FOLLOWER\_COUNT}} \right) \times 100$$
-   - The system never mixes `views` and `followerCount` in the same analytical comparison.
-   - Division-by-zero protection: If the effective denominator is $\le 0$, it safely defaults to $1$.
-
----
-
-### 4. Domain Data Contracts & Type Definitions
-
-```typescript
-export type MediaType = 'IMAGE' | 'VIDEO' | 'REEL' | 'CAROUSEL_ALBUM';
-
-export interface NormalizedPost {
-  id: string;
-  caption: string;
-  mediaType: MediaType;
-  timestamp: string; // ISO 8601
-  likes: number;
-  comments: number;
-  reach: number; // Unique accounts reached across all formats
-  views: number | null; // Nullable for IMAGE & CAROUSEL; populated for REEL
-  permalink: string;
-}
-
-export interface PostAnalyticsResult {
-  post: NormalizedPost;
-  weightedEngagementRate: number; // ((likes + 3 * comments) / reach) * 100
-  replayRatio?: number | null; // views / reach (for REEL)
-  effectiveDenominator: number;
-  denominatorType: 'REACH' | 'FOLLOWER_COUNT' | 'FALLBACK';
-}
-
-export interface AggregateAnalytics {
-  totalPosts: number;
-  meanWeightedEngagementRate: number;
-  formatPerformance: Record<MediaType, { count: number; meanEngagementRate: number }>;
-  topPerformers: PostAnalyticsResult[];
-  bottomPerformers: PostAnalyticsResult[];
-}
-
-export interface StrategicRecommendations {
-  summary: string;
-  topPerformingThemes: string[];
-  recommendedFormatMix: {
-    format: MediaType;
-    targetPercentage: number;
-    rationale: string;
-  }[];
-  contentHooks: string[];
-  actionItems: string[];
-}
+```text
+WER (%) = ((likes + 3 * comments) / reach) * 100
 ```
 
----
+Reach represents unique accounts exposed to a post and is available across all
+three formats, so using it makes engagement rates comparable. Likes represent
+lightweight engagement; comments receive a 3× weight to recognize the greater
+effort and intent they represent. The API's `InstagramPostSchema` requires
+positive integer reach and validates that `views` is populated for Reels and
+null for Carousels and Images.
 
-### 5. Frontend Architecture (`frontend/`)
+Video views are kept separate from cross-format WER. For Reels only, the
+analytics service calculates:
 
-- **Framework**: Next.js 14+ (App Router).
-- **Styling**: Tailwind CSS configured with CSS variables.
-- **Theme**: Dark mode by default (`<html class="dark">`).
-- **Component Primitives**: `shadcn/ui` based on Radix UI:
-  - `Card`, `CardHeader`, `CardTitle`, `CardContent`
-  - `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent`
-  - `Badge` (used for `MediaType` and sentiment status)
-  - `Button`
-  - `Table`, `TableHeader`, `TableRow`, `TableHead`, `TableCell`, `TableBody`
-  - `Select`
-- **Client/Server Boundary**:
-  - Server components for initial static layout rendering.
-  - Client components (`"use client"`) for interactive data filtering, sorting, and manual AI generation triggers.
+```text
+replayRatio = views / reach
+```
+
+This ratio describes plays per reached account, including repeat plays, without
+changing the denominator used to compare engagement across formats. The service
+rounds per-post WER and replay ratio to two decimal places.
+
+## AI grounding and hallucination guardrails
+
+- The deterministic analytics service calculates aggregates, patterns, format
+  comparisons, and ranked posts before Gemini is called. The model synthesizes
+  the verified report; it is not asked to calculate raw statistics.
+- Gemini uses the official `@google/genai` client with `gemini-2.5-flash`,
+  `apiVersion: "v1beta"`, `responseMimeType: "application/json"`, and the
+  explicit `contentStrategyResponseSchema`.
+- The generated JSON is parsed and validated by
+  `ContentStrategyResponseSchema` (Zod), including required recommendation
+  fields and non-empty `supportingPostIds`.
+- The service checks each cited `supportingPostId` against the IDs in the
+  provider dataset and rejects recommendations that cite nonexistent posts.
+
+## API and configuration
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/health` | Health check and provider status. |
+| `GET` | `/api/posts` | Posts; accepts optional `postType` and `topic` query filters. |
+| `GET` | `/api/analytics` | Deterministic analytics report. |
+| `POST` | `/api/recommendations` | Generate an evidence-backed strategy. |
+
+Configure the backend in `backend/.env` with `PORT`, `GEMINI_API_KEY`, and
+`GOOGLE_GENAI_API_VERSION=v1beta`. The frontend reads
+`NEXT_PUBLIC_API_URL` from `frontend/.env.local`; the local default is
+`http://localhost:4000/api`. See the root `.env.example` for the template.
+
+## Architectural Trade-offs & v2 Production Roadmap
+
+| v1 prototype choice | Why it fits the 3-day prototype | v2 production direction |
+| --- | --- | --- |
+| Simulated provider with 60 sample posts in JSON; Graph API adapter remains a stub. | Makes analytics and the AI experience repeatable without waiting on Meta app review, credentials, or account permissions. | Implement Meta Graph API integration with OAuth 2.0, token lifecycle and permission handling, pagination, rate-limit handling, and provider-payload validation. |
+| Stateless JSON ingestion and on-demand analytics; no database or historical snapshots. | Keeps setup and deployment small while establishing a replaceable `IContentProvider` boundary and deterministic baseline. | Persist normalized posts and time-series performance snapshots in PostgreSQL to support history, trend comparisons, refreshes, and backfills. |
+| Single workspace and no user/tenant authentication. | Concentrates the prototype on validating the analysis workflow and interface instead of identity, authorization, and tenant provisioning. | Add authenticated multi-tenant workspaces, tenant-scoped provider credentials and data, role-based access, and isolation tests. |
+
+The roadmap describes planned production work; those v2 integrations are not
+implemented in the current prototype.

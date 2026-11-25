@@ -7,13 +7,10 @@ import {
   ChartNoAxesColumnIncreasing,
   Heart,
   MessageCircle,
-  Sparkles,
   Target,
   Video,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CommandMenu } from "@/components/shell/CommandMenu";
@@ -22,6 +19,7 @@ import { TopHeader } from "@/components/shell/TopHeader";
 import { PostInspectorSheet } from "@/components/inspector/PostInspectorSheet";
 import { AnalyticsView } from "@/components/views/AnalyticsView";
 import { PostFeedView } from "@/components/views/PostFeedView";
+import { StrategistView } from "@/components/views/StrategistView";
 import {
   enrichPost,
   generateRecommendations,
@@ -115,131 +113,6 @@ function SectionHeading({ title, detail }: { title: string; detail: string }) {
       <div>
         <h2 className="text-[13px] font-semibold tracking-[-0.02em] text-[#20232B]">{title}</h2>
         <p className="mt-1 text-[11px] text-[#858B95]">{detail}</p>
-      </div>
-    </div>
-  );
-}
-
-function StrategyContent({
-  strategy,
-  onGenerate,
-  isGenerating,
-  postsById,
-  onSelectPost,
-}: {
-  strategy: ContentStrategyResponse | null;
-  onGenerate: () => void;
-  isGenerating: boolean;
-  postsById: Map<string, EnrichedPost>;
-  onSelectPost: (post: EnrichedPost) => void;
-}) {
-  if (!strategy) {
-    return (
-      <Card className="rounded-lg border border-dashed border-[#DADDE2] bg-white py-0 shadow-none">
-        <CardContent className="flex min-h-[245px] flex-col items-center justify-center px-6 py-10 text-center">
-          <span className="mb-4 flex size-10 items-center justify-center rounded-xl bg-[#F0F1FC] text-[#5E6AD2]">
-            <Sparkles size={18} />
-          </span>
-          <h3 className="text-[14px] font-semibold text-[#20232B]">
-            A smarter content plan starts here
-          </h3>
-          <p className="mt-2 max-w-md text-[12px] leading-5 text-[#777D87]">
-            Generate a strategy grounded in your posts, engagement patterns, and best-performing
-            formats.
-          </p>
-          <Button
-            onClick={onGenerate}
-            disabled={isGenerating}
-            className="mt-5 h-8 gap-2 bg-[#5E6AD2] px-3 text-[11px] text-white hover:bg-[#4F5BC4]"
-          >
-            <Sparkles size={13} />
-            {isGenerating ? "Building your strategy…" : "Generate AI Strategy"}
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      <Card className="rounded-lg border border-[#E6E6E6] py-0 shadow-none">
-        <CardHeader className="px-5 pb-0 pt-5">
-          <Badge className="w-fit rounded-full border border-[#E4E5FB] bg-[#F0F1FC] px-2 py-1 text-[10px] font-medium text-[#535EB8]">
-            Executive summary
-          </Badge>
-        </CardHeader>
-        <CardContent className="px-5 pb-5 pt-3">
-          <p className="max-w-3xl text-[13px] leading-6 text-[#404550]">
-            {strategy.executiveSummary}
-          </p>
-          {strategy.keyPatterns.length > 0 && (
-            <div className="mt-5 flex flex-wrap gap-2">
-              {strategy.keyPatterns.map((pattern) => (
-                <span
-                  key={pattern}
-                  className="rounded-md border border-[#E6E6E6] bg-[#FAFAFA] px-2.5 py-1.5 text-[10px] text-[#646A75]"
-                >
-                  {pattern}
-                </span>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-      <SectionHeading
-        title="Recommended actions"
-        detail={`${strategy.recommendations.length} recommendations informed by your performance data`}
-      />
-      <div className="grid gap-3 xl:grid-cols-2">
-        {strategy.recommendations.map((recommendation) => (
-          <Card
-            key={recommendation.id}
-            className="rounded-lg border border-[#E6E6E6] py-0 shadow-none"
-          >
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-[12px] font-semibold text-[#20232B]">
-                    {recommendation.title}
-                  </p>
-                  <p className="mt-1 text-[10px] text-[#838994]">
-                    {recommendation.recommendedFormat} · {recommendation.suggestedTopic}
-                  </p>
-                </div>
-                <Badge
-                  variant="outline"
-                  className="shrink-0 border-[#E6E6E6] text-[9px] text-[#737985]"
-                >
-                  {recommendation.expectedImpact} impact
-                </Badge>
-              </div>
-              <p className="mt-3 text-[11px] leading-5 text-[#555B66]">
-                {recommendation.actionableBrief}
-              </p>
-              <p className="mt-3 border-t border-[#EFEFEF] pt-3 text-[10px] leading-4 text-[#838994]">
-                {recommendation.dataEvidence}
-              </p>
-              {recommendation.supportingPostIds.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {recommendation.supportingPostIds.map((postId) => {
-                    const citedPost = postsById.get(postId);
-                    return citedPost ? (
-                      <button
-                        key={postId}
-                        type="button"
-                        onClick={() => onSelectPost(citedPost)}
-                        className="rounded border border-[#E6E6E6] bg-[#FAFAFB] px-1.5 py-1 font-mono text-[9px] text-[#686E79] transition-colors hover:border-[#C8CCEF] hover:bg-[#F0F1FC] hover:text-[#535EB8]"
-                        aria-label={`Inspect cited post ${postId}`}
-                      >
-                        {postId}
-                      </button>
-                    ) : null;
-                  })}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        ))}
       </div>
     </div>
   );
@@ -427,11 +300,12 @@ export default function Home() {
                         {strategyError}
                       </div>
                     )}
-                    <StrategyContent
+                    <StrategistView
                       strategy={strategy}
-                      onGenerate={handleGenerateStrategy}
                       isGenerating={isGenerating}
+                      postsAnalyzed={report?.overview.totalPosts ?? posts.length}
                       postsById={postsById}
+                      onGenerate={handleGenerateStrategy}
                       onSelectPost={setSelectedPost}
                     />
                   </>

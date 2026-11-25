@@ -1,121 +1,98 @@
 # Instagram Content Intelligence System (ICIS)
 
-An end-to-end content analytics and AI strategy engine built for the **AITL Software Engineering Recruitment Challenge**. ICIS ingests Instagram post performance data through an extensible provider interface, computes deterministic engagement metrics, and uses the **Gemini API (`@google/genai`)** with strict Structured Outputs to generate evidence-backed content recommendations.
+ICIS analyzes Instagram post performance and turns deterministic analytics into
+evidence-backed content recommendations. It is a prototype built for the AITL
+Software Engineering Recruitment Challenge, with an extensible content-provider
+interface and an interactive Next.js dashboard.
 
-> **Video Walkthrough (Deliverable #5):** `[Add 5–10 Minute Demo Video Link Here Before Submission]`
+> **Walkthrough video:** [Add 5–10 minute demo video link here before submission]
 
----
+## Features
 
-## Key Capabilities
+- **Three workspace views:** AI Strategist, Performance Analytics, and Post Feed.
+- **Post Feed:** Search captions and post IDs, filter by format or topic, and
+  inspect dense post-level performance.
+- **Slide-over post inspector:** Open posts from the feed, analytics rankings, or
+  AI recommendation citations to see captions, metrics, and the WER calculation.
+- **Command menu:** Press `⌘K` on macOS or `Ctrl+K` on Windows/Linux to switch
+  views, filter formats, and generate a strategy.
+- **Deterministic analytics:** Compare Reels, Carousels, and Images using
+  reach-normalized engagement; explore topics, caption hooks, posting windows,
+  and top/bottom post rankings.
+- **AI content strategy:** Gemini synthesizes verified analytics into
+  recommendations with exact evidence and citations to real post IDs.
+- **Light Mode UI:** Next.js App Router, TypeScript, Tailwind CSS, shadcn/ui, and
+  Motion.
 
-* **Extensible Data Ingestion (`IContentProvider`):** Decouples data collection from analytics and AI logic. Ships with `SimulatedInstagramProvider` (60 realistic posts across Reels, Carousels, and Static Images) alongside a typed `InstagramGraphProvider` adapter ready for live Meta Graph API integration.
-* **Deterministic Performance Analysis Engine:** Calculates Weighted Engagement Rate, format lift (`REEL` vs. `CAROUSEL` vs. `IMAGE`), topic performance, temporal posting trends (day-of-week & hour buckets), caption hook impact, and Top 5 vs. Bottom 5 rankings using pure, unit-tested TypeScript functions.
-* **Data-Grounded Gemini Strategist:** Feeds pre-aggregated statistical summaries into `gemini-2.5-flash` using Zod-enforced JSON schemas so every content recommendation cites real `postId`s and exact metrics from the dataset rather than generic advice.
-* **Minimal Functional Dashboard:** A dark-mode Next.js + `shadcn/ui` interface focused on data clarity, filtering, and one-click strategy generation.
-
----
-
-## System Architecture
+## Architecture
 
 ```mermaid
 flowchart LR
-    A[Simulated JSON / Meta Graph API] --> B[Ingestion Layer\nIContentProvider + Zod]
-    B --> C[Analytics Engine\nDeterministic Metrics]
-    C --> D[Gemini Intelligence\n@google/genai Structured JSON]
-    C --> E[Express REST API\n/api/posts, /analytics, /recommendations]
-    D --> E
-    E --> F[Next.js + shadcn/ui\nDark-Mode Dashboard]
+    U[User] --> F[Next.js Light Mode UI<br/>AI Strategist · Analytics · Post Feed]
+    F -->|REST / JSON| R[Express API]
+    R --> I[IContentProvider<br/>Simulated JSON + Zod validation]
+    I --> R
+    R --> A[Deterministic AnalyticsService]
+    A --> R
+    R --> G[Gemini @google/genai<br/>v1beta · structured JSON]
+    G --> R
+    R --> F
 ```
 
-### Core Engineering Decisions
-1. **Preventing LLM Hallucinations:** LLMs do not compute raw statistics. The deterministic analytics engine aggregates all ratios and rankings first; Gemini only synthesizes strategy from verified metrics and must pass Zod post-validation confirming cited `postId`s exist.
-2. **Weighted Engagement Rate Formula (Uniform Cross-Format Scale):**
-   $$\text{Weighted Engagement Rate} = \left(\frac{\text{Likes} + (3 \times \text{Comments})}{\text{Reach}}\right) \times 100$$
-   - **Uniform Denominator (`reach`):** `reach` (unique accounts reached) is available across all media types (`REEL`, `CAROUSEL`, `IMAGE`), ensuring an apples-to-apples comparison on the exact same scale without metric distortion.
-   - **Comment Weighting ($3\times$):** Comments receive a $3\times$ multiplier reflecting active cognitive investment and algorithmic ranking weight over passive double-taps.
-   - **Decoupled Video Metrics:** `views` is preserved as a video-specific metric for Reels (evaluating $\text{replayRatio} = \text{views} / \text{reach}$) rather than distorting the cross-format engagement denominator.
-   - **Uniform Fallback (`ACCOUNT_FOLLOWER_COUNT`):** If an external provider lacks `reach`, `ACCOUNT_FOLLOWER_COUNT` is applied uniformly to all formats.
+The backend separates ingestion, deterministic analytics, AI synthesis, and
+HTTP routing. The active `SimulatedInstagramProvider` reads 60 sample posts;
+the `InstagramGraphProvider` is currently a stub, not a live Meta integration.
+WER uses the same reach denominator across formats:
+`((likes + 3 * comments) / reach) * 100`. Reel `replayRatio` is computed
+separately as `views / reach`. Gemini receives deterministic summaries, returns
+structured JSON, and its response is checked with Zod, including validation
+that every cited post ID exists in the source dataset.
 
----
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for layer boundaries,
+mathematical details, hallucination safeguards, and the production roadmap.
 
-## Tech Stack
+## Tech stack
 
 | Layer | Technologies |
-| :--- | :--- |
-| **Backend API** | Node.js, Express, TypeScript, Zod |
-| **AI Intelligence** | Google Gemini API (`@google/genai`, `gemini-2.5-flash`, Structured Outputs) |
-| **Frontend UI** | Next.js (App Router), TypeScript, Tailwind CSS, `shadcn/ui` |
-| **Testing & CI** | Vitest, Supertest, GitHub Actions |
+| --- | --- |
+| Frontend | Next.js App Router, TypeScript, Tailwind CSS, shadcn/ui, Motion |
+| Backend | Node.js, Express, TypeScript, Zod |
+| Intelligence | `@google/genai`, Gemini 2.5 Flash, structured JSON output |
+| Tests | Vitest, Supertest |
 
----
+## Prerequisites
 
-## Repository Structure
+- Node.js 20+ and npm 10+
+- A Gemini API key from Google AI Studio to generate recommendations
 
-```text
-icis-content-intelligence/
-├── .agents/rules/          # Antigravity IDE verification & architectural guardrails
-├── .github/workflows/      # GitHub Actions CI pipeline (build + Vitest)
-├── backend/
-│   ├── data/               # 60-post simulated Instagram dataset (sample_posts.json)
-│   ├── src/
-│   │   ├── analytics/      # Pure deterministic metrics & trend engine
-│   │   ├── config/         # Zod-validated environment configuration
-│   │   ├── ingestion/      # IContentProvider, Simulated & Graph API providers
-│   │   ├── intelligence/   # Gemini Structured Output service
-│   │   ├── routes/         # Express REST endpoints
-│   │   └── schemas/        # Shared Zod schemas & inferred types
-│   └── tests/              # Vitest unit & Supertest API integration suites
-├── docs/
-│   ├── ARCHITECTURE.md     # Detailed system design, trade-offs & v2 roadmap
-│   ├── PRD.md              # Product requirements & metric definitions
-│   ├── ai-logs/            # AI agent task delegation, bug investigation & verification logs
-│   └── eod-reports/        # Daily development progress reports
-├── frontend/               # Next.js + shadcn/ui dashboard
-├── GEMINI.md               # Root AI workspace context & coding standards
-└── README.md
-```
+## Getting started
 
----
+Install dependencies from the repository root in each project:
 
-## Getting Started
-
-### Prerequisites
-* **Node.js** v20+ and **npm** v10+
-* A **Google Gemini API Key** (from Google AI Studio)
-
-### 1. Backend Setup (`http://localhost:4000`)
-
-```bash
+```powershell
 cd backend
 npm install
 ```
 
-Create `backend/.env` using the root `.env.example` template:
+Create `backend/.env` (do not commit API keys):
 
 ```env
 PORT=4000
+NODE_ENV=development
 GEMINI_API_KEY=your_gemini_api_key_here
+GOOGLE_GENAI_API_VERSION=v1beta
 ACCOUNT_FOLLOWER_COUNT=10000
 ```
 
-Start the Express development server:
+Start the backend:
 
-```bash
+```powershell
 npm run dev
 ```
 
-Run the automated test suite and TypeScript build check:
+In a second terminal, install frontend dependencies:
 
-```bash
-npm test
-npm run build
-```
-
-### 2. Frontend Setup (`http://localhost:3000`)
-
-Open a second terminal at the repository root:
-
-```bash
+```powershell
 cd frontend
 npm install
 ```
@@ -126,30 +103,84 @@ Create `frontend/.env.local`:
 NEXT_PUBLIC_API_URL=http://localhost:4000/api
 ```
 
-Start the Next.js dashboard:
+Start the frontend on port 3000:
 
-```bash
+```powershell
 npm run dev
 ```
 
-Open **`http://localhost:3000`** in your browser.
+Open [http://localhost:3000](http://localhost:3000). The dashboard and
+deterministic analytics work with the simulated provider; AI strategy
+generation requires a valid `GEMINI_API_KEY`.
 
----
+### Environment variables
 
-## API Reference
+| Variable | Project | Purpose |
+| --- | --- | --- |
+| `GEMINI_API_KEY` | Backend | Google Gemini API key. Required for live AI strategy generation. |
+| `GOOGLE_GENAI_API_VERSION` | Backend | Google GenAI API version. Use `v1beta` for structured output. |
+| `NEXT_PUBLIC_API_URL` | Frontend | Express API base URL available to the browser; local value is `http://localhost:4000/api`. |
+| `PORT` | Backend | Express server port; defaults to `4000`. |
+| `ACCOUNT_FOLLOWER_COUNT` | Backend | Follower-count baseline configuration; defaults to `10000`. |
+
+The root [.env.example](.env.example) contains a template for these settings.
+For local development, set backend variables in `backend/.env` and the
+frontend URL in `frontend/.env.local`.
+
+## API reference
 
 | Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/health` | Service health and active provider check |
-| `GET` | `/api/posts` | Returns normalized Instagram posts (`?postType=` and `?topic=` filters supported) |
-| `GET` | `/api/analytics` | Computes and returns full engagement, format, topic, and temporal analytics |
-| `POST` | `/api/recommendations` | Runs analytics and invokes Gemini to return structured, post-cited content recommendations |
+| --- | --- | --- |
+| `GET` | `/api/health` | Health check and provider status. |
+| `GET` | `/api/posts` | Instagram posts; optional `postType` and `topic` filters. |
+| `GET` | `/api/analytics` | Deterministic format, topic, caption, and temporal report. |
+| `POST` | `/api/recommendations` | Generate a data-grounded Gemini content strategy. |
 
----
+## Build and test audit
 
-## Documentation & Engineering Artifacts
+Run the backend TypeScript build and test suite:
 
-* **[Product Requirements Document (`docs/PRD.md`)](docs/PRD.md)** — Functional specs, metric definitions, and edge cases.
-* **[Architecture & Technical Decisions (`docs/ARCHITECTURE.md`)](docs/ARCHITECTURE.md)** — Provider extensibility, hallucination guardrails, and v2 roadmap.
-* **[AI Agent Logs (`docs/ai-logs/`)](docs/ai-logs/)** — Guardrails established, tasks delegated to Antigravity IDE, bugs caught in agent output, and test verification transcripts.
-* **[End-of-Day Reports (`docs/eod-reports/daily-updates.md`)](docs/eod-reports/daily-updates.md)** — Daily progress updates, blockers, and reflections.
+```powershell
+cd backend
+npm run build
+npm test
+```
+
+Build the frontend for production:
+
+```powershell
+cd frontend
+npm run build
+npm run lint
+```
+
+## Repository structure
+
+```text
+icis-content-intelligence/
+├── backend/
+│   ├── data/                 # 60-post simulated Instagram dataset
+│   ├── src/
+│   │   ├── analytics/        # Deterministic metrics and trends
+│   │   ├── config/           # Zod-validated environment configuration
+│   │   ├── ingestion/        # IContentProvider and provider adapters
+│   │   ├── intelligence/     # Gemini structured-output service
+│   │   ├── routes/           # Express REST endpoints
+│   │   └── schemas/          # Zod domain and strategy schemas
+│   └── tests/                # Vitest and Supertest suites
+├── docs/
+│   ├── ARCHITECTURE.md       # System design and v2 production roadmap
+│   └── PRD.md                # Product requirements and metrics
+├── frontend/
+│   └── src/
+│       ├── app/              # App Router shell and dashboard
+│       ├── components/       # Shell, views, and post inspector
+│       └── lib/              # Typed API client
+├── GEMINI.md                 # Repository development context
+└── README.md
+```
+
+## Project documentation
+
+- [Product Requirements Document](docs/PRD.md)
+- [Architecture and production roadmap](docs/ARCHITECTURE.md)
