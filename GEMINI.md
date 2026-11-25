@@ -27,13 +27,12 @@ Every backend component must strictly adhere to the separation of concerns acros
 
 ---
 
-## 2. Frontend Architecture (`frontend/`)
 
-- **Framework**: Next.js (App Router) + TypeScript + Tailwind CSS.
-- **UI Component System**: `shadcn/ui` based on Radix UI primitives.
-- **Theme**: Default to dark mode (`class="dark"` on `<html>`).
-- **Core UI Primitives**: Use standardized `@/components/ui/*` primitives (`Card`, `Tabs`, `Badge`, `Button`, `Table`, `Select`).
-- **State & Data Fetching**: Decoupled API client services communicating with `NEXT_PUBLIC_API_URL`.
+4. **Frontend Stack (`frontend/`):**
+   - Next.js (App Router) + TypeScript + Tailwind CSS + `shadcn/ui`.
+   - Use a clean, high-contrast **Light Mode** theme (`bg-slate-50` canvas with white `Card` surfaces; do NOT add `class="dark"` to `<html>`).
+   - Use `shadcn/ui` components (`Card`, `Tabs`, `Badge`, `Button`, `Table`, `Select`, `Skeleton`) from `@/components/ui/*`.
+   - When scaffolding Next.js, pass `--disable-git` so `frontend/` does not initialize a nested `.git` repository inside the monorepo.
 
 ## Git & Commit Attribution Rules (Strictly Enforced)
 - NEVER run `git commit`, `git push`, or modify `git config` (`user.name` / `user.email`). Leave all Git staging, committing, and pushing to the user.
