@@ -6,7 +6,7 @@ ICIS is a layered Instagram content intelligence prototype. The frontend present
 the product and collects user actions; the Express API coordinates providers,
 deterministic analytics, and AI synthesis.
 
-```mermaid
+```mermaid 
 flowchart LR
     U[User] --> F[Next.js App Router<br/>Linear-inspired Light Mode<br/>Tailwind CSS + shadcn/ui]
     F -->|REST / JSON| R[Express REST API]

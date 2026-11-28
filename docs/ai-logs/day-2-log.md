@@ -3,7 +3,7 @@
 ## 1. Tasks Delegated to Antigravity IDE
 - **Spec & Guardrail Patch:** Updated `GEMINI.md`, `docs/PRD.md`, `docs/ARCHITECTURE.md`, `README.md`, and `.env.example` to normalize engagement rate across all post formats (`REEL`, `CAROUSEL`, `IMAGE`) using `reach`.
 - **Prompt 2 (Data Ingestion Layer):** Delegated Zod schemas (`content.schema.ts`), `IContentProvider` adapter interface, `SimulatedInstagramProvider`, `InstagramGraphProvider` stub, 60-post dataset (`data/sample_posts.json`), and `tests/ingestion.test.ts`.
-- **Prompt 3 (Deterministic Analytics Engine):** Delegated `analytics.service.ts` and `tests/analytics.test.ts`.
+- **Prompt 3 (Deterministic Analytics  Engine):** Delegated `analytics.service.ts` and `tests/analytics.test.ts`.
 - **Prompt 4 (Gemini Intelligence & REST API):** Delegated `gemini.service.ts` (`@google/genai` Structured Outputs), Express routes (`icis.routes.ts`), and `tests/routes.test.ts`.
 
 ## 2. Guardrails & Instructions Established

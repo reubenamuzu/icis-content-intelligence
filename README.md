@@ -5,7 +5,7 @@ evidence-backed content recommendations. It is a prototype built for the AITL
 Software Engineering Recruitment Challenge, with an extensible content-provider
 interface and an interactive Next.js dashboard.
 
-> **Walkthrough video:** [Add 5–10 minute demo video link here before submission]
+> **Walkthrough video:** [[Video link]](https://drive.google.com/file/d/1GYqz6DNtT09_3KUGQZbPpeXMi6AcB0Ku/view?usp=sharing)
 
 ## Features
 

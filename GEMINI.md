@@ -1,9 +1,9 @@
 # Instagram Content Intelligence System (ICIS) - Development Rules
 
-## 1. Architectural Guardrails
+## 1. Architectural Guardrails 
 
 ### Layered Backend Architecture (`backend/src/`)
-Every backend component must strictly adhere to the separation of concerns across these layers:
+Every backend component must strictly adhere to the separation of concerns across these layers: 
 - `backend/src/ingestion/`: Responsible solely for fetching external Instagram/content provider data and normalizing it to internal domain models via `IContentProvider`. No HTTP controllers, business analytics, or LLM logic permitted here.
 - `backend/src/analytics/`: Pure, deterministic math and statistical calculations (e.g., Weighted Engagement Rate by Reach, replay ratio, standard deviation, percentile ranking). **Zero Express, HTTP, or LLM imports are allowed in this layer.** Cross-format metrics must use `reach` as the uniform denominator across all formats (`REEL`, `CAROUSEL`, `IMAGE`). `views` is reserved for video-specific metrics (e.g., `replayRatio = views / reach`) and must never be mixed into the cross-format engagement denominator. If `reach` is absent, fall back to `ACCOUNT_FOLLOWER_COUNT` uniformly across all formats.
 - `backend/src/intelligence/`: High-level AI synthesis powered exclusively by the official `@google/genai` SDK. Consumes normalized data and analytics output to generate grounded recommendations and insights.
